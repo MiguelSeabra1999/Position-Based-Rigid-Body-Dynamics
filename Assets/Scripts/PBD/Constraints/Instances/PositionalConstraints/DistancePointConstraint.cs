@@ -27,7 +27,6 @@ public class DistancePointConstraint : PBDConstraint
         bodyOffset = offset;
         anchorPoint = body.position + bodies[0].GetOrientation() * bodyOffset;
         this.engine = engine;
-
     }
 
     public void SetNewAnchor(DoubleVector3 anchor)
@@ -38,15 +37,11 @@ public class DistancePointConstraint : PBDConstraint
 
         substepCount = engine.substeps;
         currSubstep = 1;
-
     }
-
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-
         return bodyDirection * -1;
-
     }
 
     protected override double GetGradientMagnitude(int bodyIndex)
@@ -54,7 +49,7 @@ public class DistancePointConstraint : PBDConstraint
         return 1;
     }
 
-    protected override double Evaluate()
+    public override double Evaluate()
     {
         if (!moving)
             return EvaluatePoint(anchorPoint);
@@ -85,20 +80,17 @@ public class DistancePointConstraint : PBDConstraint
         if (Math.Abs(error) < accuracy)
             return 0;
         return error;
-
     }
+
     protected override void UpdateOrientation(DoubleVector3 correction, int index)
     {
-
         if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
             bodies[index].ApplyCorrectionOrientation(correction, bodyOffset);
     }
 
     protected override DoubleVector3 GetBodyR(int index)
     {
-
         return bodyOffset;
-
     }
 
     public override void Solve(double deltaTime)

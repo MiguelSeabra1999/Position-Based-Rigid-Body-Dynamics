@@ -27,7 +27,7 @@ public class PhysicsEngine : MonoBehaviour
     public List<TwistConstraint> twistConstraint = new List<TwistConstraint>();
     public List<HingeConstraint> hingeConstraint = new List<HingeConstraint>();
 
-    private CollisionEngine collisionEngine = new CollisionEngine();
+    public CollisionEngine collisionEngine = new CollisionEngine();
     public event UnityAction physicsStepEnd;
     public event UnityAction physicsSubstepEnd;
     /*private List<PBDCollision> collisions = new List<PBDCollision>();
@@ -82,13 +82,14 @@ public class PhysicsEngine : MonoBehaviour
 
             VelocitySolve(h);//Collision Handling
 
+
+            physicsSubstepEnd?.Invoke();
+
             collisionEngine.Clear();
             //temporaryConstraints.Clear();
             foreach (Particle particle in allBodies)
                 particle.PBDphysicsUpdate();
             // ClampVelocity(h);
-
-            physicsSubstepEnd?.Invoke();
         }
         UpdateActualPositions();
 
@@ -97,7 +98,8 @@ public class PhysicsEngine : MonoBehaviour
             particle.PBDupdate();
         if (storeTotalEnergy)
             StoreTotalEnergy();
-
+        if (stepByStep)
+            Pause();
         physicsStepEnd?.Invoke();
         // Debug.Break();
     }
@@ -142,16 +144,12 @@ public class PhysicsEngine : MonoBehaviour
         {
             PBDConstraint constraint = temporaryConstraints[i];
             constraint.Solve(h);
-            if (stepByStep)
-                Pause();
         }
 
         for (int i = 0; i < constraints.Count; i++)
         {
             PBDConstraint constraint = constraints[i];
             constraint.Solve(h);
-            if (stepByStep)
-                Pause();
         }
         RecalcVelocities(h);
 
@@ -166,8 +164,6 @@ public class PhysicsEngine : MonoBehaviour
             collisionEngine.count = 0;
             collisionEngine.FullCollisionDetection(collisionEngine.allColliders , h, !instantSeperateContacts);
         }
-        if (stepByStep)
-            Debug.Log("done");
     }
 
     private void ClampVelocity(double h)

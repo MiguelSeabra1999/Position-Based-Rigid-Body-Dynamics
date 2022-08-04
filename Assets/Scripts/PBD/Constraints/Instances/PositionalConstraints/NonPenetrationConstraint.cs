@@ -16,11 +16,11 @@ public class NonPenetrationConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        if (bodyIndex == 0 )
+        if (bodyIndex == 0)
         {
-            return DoubleVector3.Normal(col.correction) ;
+            return DoubleVector3.Normal(col.correction);
         }
-        return DoubleVector3.Normal(-1*col.correction);
+        return DoubleVector3.Normal(-1 * col.correction);
     }
 
     protected override double GetGradientMagnitude(int bodyIndex)
@@ -28,30 +28,30 @@ public class NonPenetrationConstraint : PBDConstraint
         return 1;
     }
 
-    protected override double Evaluate()
+    public override double Evaluate()
     {
         return DoubleVector3.Magnitude(col.correction);
     }
+
     protected override DoubleVector3 GetBodyR(int index)
     {
-        if(index == 0)
+        if (index == 0)
         {
             return col.collisionPoint - col.a.position;
         }
         else
         {
             return col.otherCollisionPoint - col.b.position;
-
         }
     }
-  /*  protected override void UpdateOrientation(DoubleVector3 correction, int index)
-    {
 
-        DoubleVector3 offset = col.rA;
-        if(index == 1)
-            offset = col.rB;
-        if(DoubleVector3.MagnitudeSqr(offset) > 0)
-            bodies[index].ApplyCorrectionOrientation(correction,offset);
-    }*/
+    /*  protected override void UpdateOrientation(DoubleVector3 correction, int index)
+      {
 
+          DoubleVector3 offset = col.rA;
+          if(index == 1)
+              offset = col.rB;
+          if(DoubleVector3.MagnitudeSqr(offset) > 0)
+              bodies[index].ApplyCorrectionOrientation(correction,offset);
+      }*/
 }

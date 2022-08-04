@@ -9,12 +9,16 @@ public class DistanceConstraint : PBDConstraint
     public double goalDistance;
     public int firstBodyIndex;
     public int secondBodyIndex;
+    public PBDRigidbody body = null;
+    public PBDRigidbody otherBody = null;
+
+
     public Vector3 firstBodyOffsetFloat;
     public Vector3 secondBodyOffsetFloat;
     public DoubleVector3 firstBodyOffset;
     public DoubleVector3 secondBodyOffset;
     protected DoubleVector3 bodyDirection;
-    
+
 /*
     DistanceConstraint(int _firstBodyIndex, int _secondBodyIndex, float, _goalDistance, double _compliance) : base(_compliance)
     {
@@ -22,19 +26,28 @@ public class DistanceConstraint : PBDConstraint
         secondBodyIndex = _secondBodyIndex;
         goalDistance = _goalDistance;
         Init();
-      
+
     }
 */
     public override void Init(Particle[] allParticles)
     {
-        bodies.Add(allParticles[firstBodyIndex]);
-        bodies.Add(allParticles[secondBodyIndex]);
+        if (body == null || otherBody == null)
+        {
+            bodies.Add(allParticles[firstBodyIndex]);
+            bodies.Add(allParticles[secondBodyIndex]);
+        }
+        else
+        {
+            bodies.Add(body);
+            bodies.Add(otherBody);
+        }
         firstBodyOffset = new DoubleVector3(firstBodyOffsetFloat);
         secondBodyOffset = new DoubleVector3(secondBodyOffsetFloat);
     }
+
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        if (bodyIndex == 0 )
+        if (bodyIndex == 0)
         {
             return bodyDirection * -1;
         }
@@ -48,17 +61,16 @@ public class DistanceConstraint : PBDConstraint
 
     protected override DoubleVector3 GetBodyR(int index)
     {
-        if(index == 0)
+        if (index == 0)
             return firstBodyOffset;
         else
             return secondBodyOffset;
     }
 
-    protected override double Evaluate()
+    public override double Evaluate()
     {
-
         DoubleVector3 distanceVec = (bodies[1].position + bodies[1].GetOrientation() * secondBodyOffset) -  (bodies[0].position + bodies[0].GetOrientation() * firstBodyOffset);
-        Debug.DrawLine((bodies[1].position + bodies[1].GetOrientation() * secondBodyOffset).ToVector3(),(bodies[0].position + bodies[0].GetOrientation() * firstBodyOffset).ToVector3());
+        Debug.DrawLine((bodies[1].position + bodies[1].GetOrientation() * secondBodyOffset).ToVector3(), (bodies[0].position + bodies[0].GetOrientation() * firstBodyOffset).ToVector3());
         bodyDirection = DoubleVector3.Normal(distanceVec);
 
         double distance = DoubleVector3.Magnitude(distanceVec);
@@ -68,16 +80,15 @@ public class DistanceConstraint : PBDConstraint
             return 0;
         return error;
     }
+
     protected override void UpdateOrientation(DoubleVector3 correction, int index)
     {
-
         DoubleVector3 offset = firstBodyOffset;
-        if(index == 1)
+        if (index == 1)
             offset = secondBodyOffset;
-        if(DoubleVector3.MagnitudeSqr(offset) > 0)
+        if (DoubleVector3.MagnitudeSqr(offset) > 0)
         {
-            bodies[index].ApplyCorrectionOrientation(correction,offset);
-  
+            bodies[index].ApplyCorrectionOrientation(correction, offset);
         }
     }
 }

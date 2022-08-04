@@ -5,8 +5,9 @@ using System.IO;
 public abstract class DataCollector : MonoBehaviour
 {
     protected PhysicsEngine engine;
-    private string baseFolder = "C:/Users/legom/PBRBD/EntityComponentSystemSamples-master/PhysicsSamples/Assets/Data";
+    private string baseFolder = "C:/Users/legom/PBRBD/EntityComponentSystemSamples-master/PBRBD-Comparissons/Assets/Data";
     public string subFolder;
+
     void Awake()
     {
         engine = GetComponent<PhysicsEngine>();

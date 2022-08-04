@@ -56,28 +56,28 @@ public class PBDColliderCapsule : PBDCollider
     public override Matrix3x3 GetInertiaTensor()
     {
         //return new Matrix3x3();
-        return new Matrix3x3() * particle.mass;
+        // return new Matrix3x3() * particle.mass;
 
-        /*Matrix3x3 I = new Matrix3x3();
+        Matrix3x3 I = new Matrix3x3();
 
-        double massCylinder = length * radius*radius * Math.PI;
-        double massHemisphere = 2 * radius*radius*radius * Math.PI / 3;
-        double totalMass = massCylinder + massHemisphere * 2;
+        double massCylinder = length * radius * radius * Math.PI;
+        double massHemisphere = 2.0 * radius * radius * radius * Math.PI / 3.0;
+        double totalMass = massCylinder + massHemisphere * 2.0;
         double ratio1 = massCylinder / totalMass;
-        double ratio2 = massHemisphere * 2 / totalMass;
+        double ratio2 = massHemisphere * 2.0 / totalMass;
         massCylinder = particle.mass * ratio1;
         massHemisphere = particle.mass * ratio2 * 0.5;
 
-        I[0] = massCylinder * (length*length / 12 + radius*radius / 4) + 2*massHemisphere*(2*radius*radius/5 + length*length/2 + 3*length*radius/8);
+        I[0] = massCylinder * (length * length / 12.0 + radius * radius / 4.0) + 2.0 * massHemisphere * (2.0 * radius * radius / 5.0 + length * length / 2.0 + 3.0 * length * radius / 8.0);
         I[1] = 0;
         I[2] = 0;
         I[3] = 0;
-        I[4] = massCylinder * (radius*radius / 2) + 2*massHemisphere * (2 * radius*radius / 5);
+        I[4] = massCylinder * (radius * radius / 2.0) + 2.0 * massHemisphere * (2.0 * radius * radius / 5.0);
         I[5] = 0;
         I[6] = 0;
         I[7] = 0;
-        I[8] = massCylinder * (length*length / 12 + radius*radius/4) + 2*massHemisphere*(2*radius*radius/5 + length*length/2 + 3*length*radius/8);
-        return I;*/
+        I[8] = massCylinder * (length * length / 12.0 + radius * radius / 4.0) + 2.0 * massHemisphere * (2.0 * radius * radius / 5.0 + length * length / 2.0 + 3.0 * length * radius / 8.0);
+        return I;
     }
 
     public override Matrix3x3 GetInertiaTensorInverted()

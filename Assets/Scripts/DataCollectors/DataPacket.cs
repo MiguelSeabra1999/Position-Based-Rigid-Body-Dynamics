@@ -13,6 +13,12 @@ public class DataPacket
         this.timeStamp = Time.timeSinceLevelLoadAsDouble;
     }
 
+    public DataPacket(double stamp, double data)
+    {
+        this.data = data;
+        this.timeStamp = stamp;
+    }
+
     public override string ToString()
     {
         return "[" + timeStamp + "] " + data;

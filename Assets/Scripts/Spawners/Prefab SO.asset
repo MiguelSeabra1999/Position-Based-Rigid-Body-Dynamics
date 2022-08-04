@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50966eb194dc6b74fb24e5598da5aff3, type: 3}
+  m_Name: Prefab SO
+  m_EditorClassIdentifier: 
+  pbdCube: {fileID: 1981284132829421448, guid: 33218ee11c128ad4ea80a6e3ae701b2d, type: 3}
+  pbdCapsule: {fileID: 1701273464249878723, guid: fc2cf783b42ea6f4f9ce9f5062293d5d,
+    type: 3}
+  pbdSphere: {fileID: 5373107075581347794, guid: e933baee2a9df6a4798d9dff3f260a73,
+    type: 3}
+  pbdScene: {fileID: 3971845552805209129, guid: 1f64905188e5b144f96bd2554357c1bc,
+    type: 3}
+  havokCube: {fileID: 1877213096559564713, guid: 03f99ac74d7e5f14a93952ffe722cfcb,
+    type: 3}
+  havokCapsule: {fileID: 1877213096559564713, guid: 098d82e5392e6d146baf2d02bbd438d9,
+    type: 3}
+  havokCapsuleTrigger: {fileID: 1877213096559564713, guid: 667012bd04d74c94394fe2933208df2c,
+    type: 3}
+  havokSphere: {fileID: 1877213096559564713, guid: 5c049498112f82b4fa1e51d2b2c220a3,
+    type: 3}
+  havokSphereStatic: {fileID: 1877213096559564713, guid: b1d66fa7a29a9f2499f0728dbf3c0d6c,
+    type: 3}
+  havokScene: {fileID: 2955907569638550515, guid: ea4e548251b026a4e8e8eca6c0b54364,
+    type: 3}
+  unityCube: {fileID: 1877213096559564713, guid: ddc44a0025065a445addb81db7633a88,
+    type: 3}
+  unityCapsule: {fileID: 8959662003894302202, guid: b633708f884ffd84c888e0dd95974e78,
+    type: 3}
+  unitySphere: {fileID: 1825768382248263738, guid: a6b5a090982dcf14b971c9eb946b8fc0,
+    type: 3}
+  unityScene: {fileID: 1877213096559564713, guid: 8bf6767af40040e4289d11fb40d6ad43,
+    type: 3}

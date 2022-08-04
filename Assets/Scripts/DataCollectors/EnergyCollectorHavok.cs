@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnergyCollector : DataCollector
+public class EnergyCollectorHavok : DataCollector
 {
     private List<DataPacket> totalEnergy = new List<DataPacket>();
     private List<DataPacket> kineticEnergy = new List<DataPacket>();
@@ -10,9 +10,9 @@ public class EnergyCollector : DataCollector
 
     void OnDestroy()
     {
-        WriteToFile("Energy", "totalEnergy", totalEnergy);
-        WriteToFile("Energy", "kineticEnergy", kineticEnergy);
-        WriteToFile("Energy", "potentialEnergy", potentialEnergy);
+        WriteToFile("Havok/Energy", "totalEnergy", totalEnergy);
+        WriteToFile("Havok/Energy", "kineticEnergy", kineticEnergy);
+        WriteToFile("Havok/Energy", "potentialEnergy", potentialEnergy);
     }
 
     protected override void StepEnd()
