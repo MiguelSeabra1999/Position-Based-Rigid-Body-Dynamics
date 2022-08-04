@@ -91,6 +91,7 @@ public class PBDRigidbody : Particle
         base.RecalcVelocity(h);
 
         DoubleQuaternion deltaOrientation = orientation * prevOrientation.Inverse();
+        deltaOrientation = DoubleQuaternion.Normal(deltaOrientation);
         angularVelocity = 2 * deltaOrientation.VectorPart() / h;
         angularVelocity = deltaOrientation.w >= 0 ? angularVelocity : -angularVelocity;
     }
@@ -112,12 +113,14 @@ public class PBDRigidbody : Particle
         DoubleVector3 torque = DoubleVector3.Cross(offset, correction);
 
 
-        torque = orientation * (inertiaTensorInverted * torque);
+        Debug.Log(gameObject.name + " torque " + torque + " -> " + DoubleVector3.Magnitude(torque));
+        DoubleVector3 test = torque;
+        torque =  orientation * (inertiaTensorInverted * torque);
 
-        torque *= .5;
-        DoubleQuaternion corr = new DoubleQuaternion(0, torque.x, torque.y, torque.z);
-        orientation += corr * orientation;
-
+        Debug.Log(gameObject.name + " torque Applied" + torque + " -> " + DoubleVector3.Magnitude(torque));
+        Debug.Log(gameObject.name + " torque diferemce" +  DoubleVector3.Magnitude(test) / DoubleVector3.Magnitude(torque));
+        orientation +=  0.5 * torque * orientation;
+        orientation =   DoubleQuaternion.Normal(orientation);
         /* DoubleQuaternion corr = (torque * 1.4).ToQuaternion();
          orientation +=   corr * orientation;
          orientation =   DoubleQuaternion.Normal(orientation);*/
@@ -269,8 +272,9 @@ public class PBDRigidbody : Particle
         DoubleVector3 rCrossN = DoubleVector3.Cross(r, ProjectToSelfCoordinates(correctionDir));
         // DoubleVector3 rCrossN = DoubleVector3.Cross(r, correctionDir);
 //        Debug.Log("normal w = " + inverseMass + " generalized W = " + inverseMass + DoubleVector3.Dot(rCrossN * inertiaTensorInverted, rCrossN));
-
-        return inverseMass + DoubleVector3.Dot(rCrossN * inertiaTensorInverted, rCrossN);
+        double rotationW =  DoubleVector3.Dot(rCrossN * inertiaTensorInverted, rCrossN);
+        Debug.Log(gameObject.name + " wi " + inverseMass + " " + rotationW);
+        return inverseMass + rotationW;
     }
 
     public override double GetGeneralizedInverseMass(DoubleVector3 correctionDir)

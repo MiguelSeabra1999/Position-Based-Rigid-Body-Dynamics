@@ -63,8 +63,12 @@ public abstract class PBDConstraint
 
 
             double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
-            DoubleVector3 correction = GetGradient(i) * lagrangeMult *  wi;
-            bodies[i].position += correction;
+
+            if (bodies[i].inverseMass != 0)
+            {
+                DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
+                bodies[i].position += correction;
+            }
 
             UpdateOrientation(GetGradient(i) * lagrangeMult , i);
 

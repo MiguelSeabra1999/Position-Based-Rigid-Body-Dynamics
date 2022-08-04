@@ -445,7 +445,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildOnAwake: 1
   dims: {x: 2, y: 10, z: 10}
-  startPos: {x: 0, y: 10, z: 0}
+  startPos: {x: 0, y: 1, z: 0}
   spacing: 1.2
   positionalNoise: 0
   randRotation: 0

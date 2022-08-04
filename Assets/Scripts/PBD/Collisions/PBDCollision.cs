@@ -105,7 +105,7 @@ public  class PBDCollision
         return newCol;
     }
 
-    public void Separate()
+    public void Separate()//deprecated
     {
         //Debug.DrawLine(a.transform.position, a.transform.position - (correction * percent).ToVector3()*10 , Color.red, 3f);
         //Debug.DrawLine(b.transform.position, b.transform.position + (correction * percent).ToVector3()*10 , Color.red, 3f);
@@ -117,7 +117,7 @@ public  class PBDCollision
             MoveParticle(b, correction, 1 - percent, 1, rB);
     }
 
-    private void MoveParticle(Particle particle, DoubleVector3 movement, double percent, double sign, DoubleVector3 r)
+    private void MoveParticle(Particle particle, DoubleVector3 movement, double percent, double sign, DoubleVector3 r)//Deprecaetd
     {
         DoubleVector3 corr = sign * correction * percent;
         particle.position += corr;
