@@ -75,9 +75,14 @@ public class TwistConstraint : PBDAngularConstraint
 
     protected override DoubleVector3 GetGradient(int i)
     {
-        if (i == 1)
-            return -1 * DoubleVector3.Normal(deltaRotTarget);
         return DoubleVector3.Normal(deltaRotTarget);
+    }
+
+    protected override double GetSign(int i)
+    {
+        if (i == 0)
+            return 1;
+        return -1;
     }
 
     protected override DoubleQuaternion GetGradientAngle(int i)

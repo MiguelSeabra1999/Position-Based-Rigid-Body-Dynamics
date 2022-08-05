@@ -22,11 +22,14 @@ public class StaticFrictionConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        if (bodyIndex == 0)
-        {
-            return gradient;
-        }
-        return -1 * gradient;
+        return gradient;
+    }
+
+    protected override double GetSign(int i)
+    {
+        if (i == 0)
+            return 1;
+        return -1;
     }
 
     protected override double GetGradientMagnitude(int bodyIndex)

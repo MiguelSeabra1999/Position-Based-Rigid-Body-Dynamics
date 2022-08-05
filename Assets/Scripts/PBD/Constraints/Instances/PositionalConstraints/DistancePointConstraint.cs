@@ -44,6 +44,11 @@ public class DistancePointConstraint : PBDConstraint
         return bodyDirection * -1;
     }
 
+    protected override double GetSign(int i)
+    {
+        return 1;
+    }
+
     protected override double GetGradientMagnitude(int bodyIndex)
     {
         return 1;
@@ -82,10 +87,10 @@ public class DistancePointConstraint : PBDConstraint
         return error;
     }
 
-    protected override void UpdateOrientation(DoubleVector3 correction, int index)
+    protected override void UpdateOrientation(DoubleVector3 correction, double sign, int index)
     {
         if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
-            bodies[index].ApplyCorrectionOrientation(correction, bodyOffset);
+            bodies[index].ApplyCorrectionOrientation(correction, sign, bodyOffset);
     }
 
     protected override DoubleVector3 GetBodyR(int index)

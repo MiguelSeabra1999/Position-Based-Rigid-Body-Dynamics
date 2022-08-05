@@ -26,7 +26,19 @@ public class SpawnerComparissons : MonoBehaviour
             return;
         ClearHierarchy();
         CreateScenes();
+
+        CreateWrekingBall();
+    }
+
+    [ContextMenu("CreateWrekingBall")]
+    private void CreateWrekingBall()
+    {
+        startPos = new Vector3(0, 11, 0);
+        dims = new Vector3Int(8, 0, 0);
         SpawnRope();
+        startPos = new Vector3(0, .5f, 0);
+        dims = new Vector3Int(3, 2, 5);
+        SpawnCube();
     }
 
     [ContextMenu("CreateScenes")]
@@ -105,6 +117,14 @@ public class SpawnerComparissons : MonoBehaviour
         SpawnInstance(prefabSO.pbdCapsule, pos, rot, pbd.transform);
         SpawnInstance(prefabSO.havokCapsule, pos, rot, havok.transform);
         SpawnInstance(prefabSO.unityCapsule, pos, rot, unity.transform);
+    }
+
+    private (GameObject, GameObject, GameObject)  SpawnAllVersionsSphere(Vector3 pos, Quaternion rot)
+    {
+        GameObject obj = SpawnInstance(prefabSO.pbdSphere, pos, rot, pbd.transform);
+        GameObject objHavok = SpawnInstance(prefabSO.havokSphere, pos, rot, havok.transform);
+        GameObject objUnity = SpawnInstance(prefabSO.unitySphere, pos, rot, unity.transform);
+        return (obj, objHavok, objUnity);
     }
 
     private (GameObject, GameObject, GameObject) SpawnAllVersionsCapsuleTrigger(Vector3 pos, Quaternion rot)
@@ -209,6 +229,16 @@ public class SpawnerComparissons : MonoBehaviour
         unityConstraint.anchor = Vector3.zero;
     }
 
+    private void MakeLastConstraint((GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject) b)
+    {
+        DistanceConstraint pbdConstraint = MakePBDConstraint(a.Item1, b.Item1);
+        pbdConstraint.secondBodyOffsetFloat = Vector3.zero;
+        BallAndSocketJoint havokConstraint = MakeHavokConstraint(a.Item2, b.Item2);
+        havokConstraint.PositionInConnectedEntity = Vector3.zero;
+        ConfigurableJoint unityConstraint = MakeUnityConstraint(a.Item3, b.Item3);
+        unityConstraint.connectedAnchor = Vector3.zero;
+    }
+
     private void MakeConstraint((GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject) b)
     {
         MakePBDConstraint(a.Item1, b.Item1);
@@ -231,6 +261,9 @@ public class SpawnerComparissons : MonoBehaviour
             else
                 MakeConstraint(previousObjects, objects);
         }
+
+        (GameObject, GameObject, GameObject)spheres = SpawnAllVersionsSphere(startPos + Vector3.right * dims.x, Quaternion.identity);
+        MakeLastConstraint(objects, spheres);
     }
 
     private void ClearHierarchy()

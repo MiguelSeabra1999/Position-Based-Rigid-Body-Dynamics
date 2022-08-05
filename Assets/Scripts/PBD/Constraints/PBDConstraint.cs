@@ -24,6 +24,7 @@ public abstract class PBDConstraint
     protected abstract double GetGradientMagnitude(int i);
     public abstract double Evaluate();
     protected abstract DoubleVector3 GetGradient(int i);
+    protected abstract double GetSign(int i);
 
     protected virtual bool LagrangeMultConstraint() {return false;}
     protected virtual DoubleVector3 GetBodyR(int index)
@@ -67,10 +68,10 @@ public abstract class PBDConstraint
             if (bodies[i].inverseMass != 0)
             {
                 DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
-                bodies[i].position += correction;
+                bodies[i].position += GetSign(i) * correction;
             }
 
-            UpdateOrientation(GetGradient(i) * lagrangeMult , i);
+            UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
 
             if (bodies[i].GetOrientation().IsNan())
                 Debug.Log("Nan found rotation" + bodies[i].gameObject);
@@ -85,7 +86,7 @@ public abstract class PBDConstraint
                  Debug.Log("error " + newError);*/
     }
 
-    protected virtual void UpdateOrientation(DoubleVector3 correction, int index)
+    protected virtual void UpdateOrientation(DoubleVector3 correction, double sign, int index)
     {
         return;
     }

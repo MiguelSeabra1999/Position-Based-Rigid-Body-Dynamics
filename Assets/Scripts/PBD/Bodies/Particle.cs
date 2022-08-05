@@ -27,7 +27,7 @@ public abstract class Particle : MonoBehaviour
      public bool appliedStaticFriction;*/
 
     public abstract DoubleQuaternion GetOrientation();
-    public abstract void ApplyCorrectionOrientation(DoubleVector3 correction, DoubleVector3 offset);
+    public abstract void ApplyCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset);
     public abstract void ApplyCorrectionPrevOrientation(DoubleVector3 correction, DoubleVector3 offset);
     public virtual DoubleQuaternion GetPrevOrientation()
     {

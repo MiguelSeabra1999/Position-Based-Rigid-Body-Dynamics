@@ -119,9 +119,9 @@ public  class PBDCollision
 
     private void MoveParticle(Particle particle, DoubleVector3 movement, double percent, double sign, DoubleVector3 r)//Deprecaetd
     {
-        DoubleVector3 corr = sign * correction * percent;
+        DoubleVector3 corr = correction * percent;
         particle.position += corr;
-        particle.ApplyCorrectionOrientation(corr, r);
+        particle.ApplyCorrectionOrientation(corr, sign, r);
     }
 
     public void HandleCollision(double h)

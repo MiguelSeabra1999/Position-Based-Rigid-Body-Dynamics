@@ -103,7 +103,7 @@ public class PBDRigidbody : Particle
         UpdatePrevPosition();
     }
 
-    public override void ApplyCorrectionOrientation(DoubleVector3 correction, DoubleVector3 offset) //used in constraints
+    public override void ApplyCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset) //used in constraints
     {
         DoubleVector3 prevPos = position + orientation * offset;
 
@@ -113,13 +113,11 @@ public class PBDRigidbody : Particle
         DoubleVector3 torque = DoubleVector3.Cross(offset, correction);
 
 
-        Debug.Log(gameObject.name + " torque " + torque + " -> " + DoubleVector3.Magnitude(torque));
         DoubleVector3 test = torque;
         torque =  orientation * (inertiaTensorInverted * torque);
 
-        Debug.Log(gameObject.name + " torque Applied" + torque + " -> " + DoubleVector3.Magnitude(torque));
-        Debug.Log(gameObject.name + " torque diferemce" +  DoubleVector3.Magnitude(test) / DoubleVector3.Magnitude(torque));
-        orientation +=  0.5 * torque * orientation;
+
+        orientation += sign * 0.5 * torque * orientation;
         orientation =   DoubleQuaternion.Normal(orientation);
         /* DoubleQuaternion corr = (torque * 1.4).ToQuaternion();
          orientation +=   corr * orientation;
@@ -127,7 +125,7 @@ public class PBDRigidbody : Particle
 
 
         DoubleVector3 newPos = position + orientation * offset;
-        position += (prevPos - newPos);
+        // position += (prevPos - newPos);
     }
 
     public override void ApplyRotation(DoubleVector3 p, double sign, DoubleVector3 r)//Used in restitution
@@ -145,56 +143,6 @@ public class PBDRigidbody : Particle
 
         angularVelocity += sign * torque;
     }
-
-    /*  public override void ApplyCorrectionOrientation(DoubleVector3 correction, DoubleVector3 offset)//used in constraints
-      {
-          DoubleVector3 prevPos = position + orientation * offset;
-
-          correction = ProjectToSelfCoordinates(correction);
-
-          DoubleVector3 rCrossP = DoubleVector3.Cross(offset, correction);
-
-
-          DoubleVector3 aux = orientation * (inertiaTensorInverted * (rCrossP));
-
-          double angle = Math.Asin(Math.Min(DoubleVector3.Magnitude(aux), 1));
-
-          aux = DoubleVector3.Normal(aux) * angle * .5;
-          //Debug.Log("rotating " + aux);
-          DoubleQuaternion corr = aux.ToQuaternion();
-
-          orientation = corr * orientation;
-          orientation = DoubleQuaternion.Normal(orientation);
-
-          DoubleVector3 newPos = position + orientation * offset;
-          position += (prevPos - newPos);
-      }*/
-
-    /* public override void ApplyRotation(DoubleVector3 p, double sign, DoubleVector3 r)//Used in restitution
-     {
-         if(inverseMass == 0)
-             return;
-
-
-         DoubleVector3 rCrossP = DoubleVector3.Cross(r,p+r);
-
-         rCrossP = ProjectToSelfCoordinates(rCrossP);
-
-         if(DoubleVector3.MagnitudeSqr(rCrossP) == 0)
-             return;
-
- //        Debug.Log(sign*(inertiaTensorInverted * rCrossP));
-         rCrossP = inertiaTensorInverted * rCrossP;
-         rCrossP = orientation*rCrossP;
-
-         double angle = Math.Asin(Math.Min(DoubleVector3.Magnitude(rCrossP),1)) * 0.5;
-         rCrossP = DoubleVector3.Normal(rCrossP) * angle;
-
-
-
-         angularVelocity += sign* rCrossP;
-     }*/
-
 
     public override void ApplyCorrectionPrevOrientation(DoubleVector3 correction, DoubleVector3 offset)
     {
@@ -273,7 +221,7 @@ public class PBDRigidbody : Particle
         // DoubleVector3 rCrossN = DoubleVector3.Cross(r, correctionDir);
 //        Debug.Log("normal w = " + inverseMass + " generalized W = " + inverseMass + DoubleVector3.Dot(rCrossN * inertiaTensorInverted, rCrossN));
         double rotationW =  DoubleVector3.Dot(rCrossN * inertiaTensorInverted, rCrossN);
-        Debug.Log(gameObject.name + " wi " + inverseMass + " " + rotationW);
+        // Debug.Log(gameObject.name + " wi " + inverseMass + " " + rotationW);
         return inverseMass + rotationW;
     }
 

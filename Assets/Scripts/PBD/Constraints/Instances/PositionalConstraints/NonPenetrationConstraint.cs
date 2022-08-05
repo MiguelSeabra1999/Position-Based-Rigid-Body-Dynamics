@@ -16,11 +16,14 @@ public class NonPenetrationConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        if (bodyIndex == 0)
-        {
-            return DoubleVector3.Normal(col.correction);
-        }
-        return DoubleVector3.Normal(-1 * col.correction);
+        return DoubleVector3.Normal(col.correction);
+    }
+
+    protected override double GetSign(int i)
+    {
+        if (i == 0)
+            return 1;
+        return -1;
     }
 
     protected override double GetGradientMagnitude(int bodyIndex)

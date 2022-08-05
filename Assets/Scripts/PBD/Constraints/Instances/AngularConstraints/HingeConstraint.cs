@@ -64,9 +64,14 @@ public class HingeConstraint : PBDAngularConstraint
 
     protected override DoubleVector3 GetGradient(int i)
     {
+        return DoubleVector3.Normal(deltaRotTarget);
+    }
+
+    protected override double GetSign(int i)
+    {
         if (i == 0)
-            return DoubleVector3.Normal(deltaRotTarget);
-        return -1 * DoubleVector3.Normal(deltaRotTarget);
+            return 1;
+        return -1;
     }
 
     protected override DoubleQuaternion GetGradientAngle(int i)

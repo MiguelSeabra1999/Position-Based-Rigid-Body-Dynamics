@@ -47,11 +47,14 @@ public class DistanceConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        if (bodyIndex == 0)
-        {
-            return bodyDirection * -1;
-        }
         return bodyDirection;
+    }
+
+    protected override double GetSign(int i)
+    {
+        if (i == 0)
+            return -1;
+        return 1;
     }
 
     protected override double GetGradientMagnitude(int bodyIndex)
@@ -81,14 +84,14 @@ public class DistanceConstraint : PBDConstraint
         return error;
     }
 
-    protected override void UpdateOrientation(DoubleVector3 correction, int index)
+    protected override void UpdateOrientation(DoubleVector3 correction, double sign, int index)
     {
         DoubleVector3 offset = firstBodyOffset;
         if (index == 1)
             offset = secondBodyOffset;
         if (DoubleVector3.MagnitudeSqr(offset) > 0)
         {
-            bodies[index].ApplyCorrectionOrientation(correction, offset);
+            bodies[index].ApplyCorrectionOrientation(correction, sign, offset);
         }
     }
 }
