@@ -37,6 +37,6 @@ public class ErrorCollectionRoutine : DataCollector
         if (currentSteps <= maxSubsteps)
             StartCoroutine(TestScenario(currentSteps));
         else
-            WriteToFile("Error", "errorEvolution", meanError);
+            FileWritter.WriteToFile("Error", "errorEvolution", meanError);
     }
 }

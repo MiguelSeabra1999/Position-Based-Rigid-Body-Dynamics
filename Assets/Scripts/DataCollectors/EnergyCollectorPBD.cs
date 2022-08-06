@@ -10,9 +10,9 @@ public class EnergyCollectorPBD : DataCollector
 
     void OnDestroy()
     {
-        WriteToFile("PBD/Energy", "totalEnergy", totalEnergy);
-        WriteToFile("PBD/Energy", "kineticEnergy", kineticEnergy);
-        WriteToFile("PBD/Energy", "potentialEnergy", potentialEnergy);
+        FileWritter.WriteToFile("PBD/Energy", "totalEnergy", totalEnergy);
+        FileWritter.WriteToFile("PBD/Energy", "kineticEnergy", kineticEnergy);
+        FileWritter.WriteToFile("PBD/Energy", "potentialEnergy", potentialEnergy);
     }
 
     protected override void StepEnd()

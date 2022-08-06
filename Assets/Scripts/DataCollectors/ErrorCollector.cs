@@ -10,7 +10,7 @@ public class ErrorCollector : DataCollector
     private  List<double> error = new List<double>();
     void OnDestroy()
     {
-        WriteToFile("Error", "meanErrorConstraints", constraintsError);
+        FileWritter.WriteToFile("Error", "meanErrorConstraints", constraintsError);
         /*  WriteToFile("Error", "meanErrorCollisions", collisionsError);
           WriteToFile("Error", "meanError", totalError);*/
     }

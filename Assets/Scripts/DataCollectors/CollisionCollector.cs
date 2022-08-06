@@ -8,7 +8,7 @@ public class CollisionCollector : DataCollector
     private CollisionEngine collisionEngine;
     void OnDestroy()
     {
-        WriteToFile("Collisions", "collisionTimes", collisionTimeStamps);
+        FileWritter.WriteToFile("PBD/Collisions", "collisionTimes", collisionTimeStamps);
     }
 
     void Start()

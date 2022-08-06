@@ -60,6 +60,7 @@ public partial class CollisionEventImpulseSystem : SystemBase
 
         public void Execute(CollisionEvent collisionEvent)
         {
+            Debug.Log("HIT");
             Entity entityA = collisionEvent.EntityA;
             Entity entityB = collisionEvent.EntityB;
 
