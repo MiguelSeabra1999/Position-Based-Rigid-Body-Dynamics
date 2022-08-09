@@ -14,6 +14,19 @@ public struct AABB
         this.pos = pos + new DoubleVector3(EPSILON);
     }
 
+    public bool CollidesWith(AABB other)
+    {
+        return (neg.x <= other.pos.x && pos.x >= other.neg.x) &&
+            (neg.y <= other.pos.y && pos.y >= other.neg.y) &&
+            (neg.z <= other.pos.z && pos.z >= other.neg.z);
+    }
+
+    public void Expand(double amount)
+    {
+        neg -= new DoubleVector3(amount);
+        pos += new DoubleVector3(amount);
+    }
+
     public static AABB Join(AABB a, AABB b)
     {
         DoubleVector3 neg = DoubleVector3.MinValues(a.neg, b.neg);
@@ -21,29 +34,6 @@ public struct AABB
         return new AABB(neg, pos);
     }
 
-/*
-    public static AABB Join(AABB[] aabbs)
-    {
-        AABB result = aabbs[0];
-
-        for(int i = 0; i < aabbs.Length; i++)
-        {
-            result = AABB.Join(result, aabbs[i]);
-        }
-
-        return result;
-    }
-    public static AABB Join(List<AABB> aabbs)
-    {
-        AABB result = aabbs[0];
-
-        for(int i = 0; i < aabbs.Count; i++)
-        {
-            result = AABB.Join(result, aabbs[i]);
-        }
-
-        return result;
-    }*/
     public static AABB Join(PBDCollider[] aabbs)
     {
         AABB result = aabbs[0].aabb;

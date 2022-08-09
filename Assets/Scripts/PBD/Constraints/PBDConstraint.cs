@@ -69,9 +69,9 @@ public abstract class PBDConstraint
             {
                 DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
                 bodies[i].position += GetSign(i) * correction;
+                UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
             }
 
-            UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
 
             if (bodies[i].GetOrientation().IsNan())
                 Debug.Log("Nan found rotation" + bodies[i].gameObject);

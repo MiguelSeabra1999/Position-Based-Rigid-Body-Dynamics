@@ -51,6 +51,26 @@ public class TwistConstraint : PBDAngularConstraint
 
     public override double Evaluate()
     {
+        DoubleVector3 up = new DoubleVector3(Vector3.up);
+        double angle0 =  DoubleVector3.AngleBetween(bodies[0].up, up);
+        DoubleVector3 dir0 = DoubleVector3.Cross(bodies[0].up, up);
+        DoubleQuaternion body0rot = new DoubleQuaternion(angle0, dir0);
+        double angle1 =  DoubleVector3.AngleBetween(bodies[1].up, up);
+        DoubleVector3 dir1 = DoubleVector3.Cross(bodies[1].up, up);
+        DoubleQuaternion body1rot = new DoubleQuaternion(angle1, dir1);
+
+        DoubleQuaternion body0oriented = body0rot * bodies[0].GetOrientation();
+        DoubleQuaternion body1oriented = body1rot * bodies[1].GetOrientation();
+
+        DoubleQuaternion error = body0oriented * body1oriented.Inverse();
+        deltaRotTarget = error.ToEuler();
+
+
+        return DoubleVector3.Magnitude(deltaRotTarget);
+    }
+
+/*  public override double Evaluate()
+    {
         DoubleVector3 worldA1 = bodies[0].GetOrientation() * a1;
         DoubleVector3 worldB1 = bodies[0].GetOrientation() * b1;
         // DoubleVector3 worldC1 = bodies[0].GetOrientation() * c1;
@@ -61,7 +81,7 @@ public class TwistConstraint : PBDAngularConstraint
         //  DoubleVector3 worldR2    = bodies[1].GetOrientation() * r2;
 
         DoubleVector3 sum = (worldA1 + worldA2);
-        DoubleVector3 n = DoubleVector3.Normal(sum);
+        DoubleVector3 n = sum / DoubleVector3.Normal(sum);
         DoubleVector3 n1 = worldB1 - DoubleVector3.Dot(n, worldB1) * n;
         n1 = DoubleVector3.Normal(n1);
         DoubleVector3 n2 = worldB2 - DoubleVector3.Dot(n, worldB2) * n;
@@ -71,7 +91,7 @@ public class TwistConstraint : PBDAngularConstraint
         // Debug.Log("twist");
 
         return angle;
-    }
+    }*/
 
     protected override DoubleVector3 GetGradient(int i)
     {
@@ -81,15 +101,18 @@ public class TwistConstraint : PBDAngularConstraint
     protected override double GetSign(int i)
     {
         if (i == 0)
-            return 1;
-        return -1;
+            return -1;
+        return 1;
     }
 
-    protected override DoubleQuaternion GetGradientAngle(int i)
+    public override void Solve(double deltaTime)
     {
-        DoubleQuaternion rot = new DoubleQuaternion(DoubleVector3.Magnitude(deltaRotTarget), DoubleVector3.Normal(deltaRotTarget));
-        if (i == 1)
-            return rot;
-        return rot;
+        base.Solve(deltaTime);
+        double newError = Evaluate();
+        if (newError >= 0.1)
+        {
+            Debug.Log("Twist diverge" + newError);
+            // Debug.Break();
+        }
     }
 }

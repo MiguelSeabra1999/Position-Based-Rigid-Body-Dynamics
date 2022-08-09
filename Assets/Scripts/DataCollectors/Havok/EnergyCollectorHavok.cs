@@ -61,6 +61,7 @@ public class EnergyCollectorHavok : MonoBehaviour
         }
         if (sum == 0)
             return;
+        //  Debug.Log(buffer.Count);
         data.Add(new DataPacket(sum));
         buffer.Clear();
     }

@@ -227,13 +227,13 @@ public class PBDRigidbody : Particle
 
     public override double GetGeneralizedInverseMass(DoubleVector3 correctionDir)
     {
-        return inverseMass;
-        /* if(inverseMass == 0)
-             return 0;
-         correctionDir = ProjectToSelfCoordinates(correctionDir);
+        //   return inverseMass;
+        if (inverseMass == 0)
+            return 0;
+        correctionDir = ProjectToSelfCoordinates(correctionDir);
 
-         DoubleVector3 aux = correctionDir * inertiaTensorInverted;
-         return DoubleVector3.Dot(aux, correctionDir);*/
+        DoubleVector3 aux = correctionDir * inertiaTensorInverted;
+        return DoubleVector3.Dot(aux, correctionDir);
     }
 
     public override double CalcKineticEnergy()

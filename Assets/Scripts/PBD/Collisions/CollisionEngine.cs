@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class CollisionEngine
 {
+    public double k = 2;
     public PBDCollider[] allColliders;
     public PBDCollider[] excludedColliders;
 
@@ -86,30 +87,14 @@ public class CollisionEngine
         //  Debug.Log("----------");
         NarrowCollisionDetectionRecursive(root, createConstraints, h);
 
-        /* for(int i = 0; i < allColliders.Length; i++)
-         {
-             for(int j = i + 1; j < allColliders.Length; j++)
-             {
-                 int minInd = Mathf.Min(i,j);
-                 int maxInd = Mathf.Max(i,j);
-                 if(checkedCols[minInd,maxInd])
-                 {
-                       CheckCollision(allColliders[i], allColliders[j],createConstraints, h);
-                 }
-
-             }
-         }*/
-        //   if(colCount > 0)
-        //   Debug.Log("colCount " + colCount );
 
         CheckCollisionWithPlane(createConstraints, h);
-//        Debug.Log(count);
-        /*  if(count > 0)
-              Debug.Break();*/
     }
 
     public void NarrowCollisionDetectionRecursive(BVH_node node, bool createConstraints, double h)
     {
+        if (node.colliders.Length <= 1)
+            return;
         if (node.firstSon == null && node.secondSon == null)
         {
             //node.aabb.DrawWireframe(Color.cyan);
@@ -117,7 +102,7 @@ public class CollisionEngine
              foreach(PBDCollider c in node.colliders)
                  str += " ," + c.name;
              Debug.Log("check node " + str );*/
-
+            // Debug.Log(node.colliders.Length);
             FullCollisionDetection(node.colliders, h, createConstraints);
             return;
         }
@@ -132,6 +117,9 @@ public class CollisionEngine
         for (int i = 0; i < allColliders.Length; i++)
         {
             allColliders[i].CalcBoundingBox();
+            double expansion = k * Time.deltaTime * DoubleVector3.Magnitude(allColliders[i].particle.velocity);
+            if (k > 0)
+                allColliders[i].aabb.Expand(expansion);
         }
     }
 
@@ -145,7 +133,7 @@ public class CollisionEngine
             {
                 //       Debug.Log("cheking " + colArr[i].particle.gameObject.name  + "  " + colArr[j].particle.gameObject.name );
                 //   if(colArr[i].GetColliderType() == ColliderType.planeY || colArr[j].GetColliderType() == ColliderType.planeY )
-
+                ;
                 CheckCollision(colArr[i], colArr[j], createConstraints, h);
                 if (colArr[i].GetColliderType() != PBDColliderType.planeY && colArr[j].GetColliderType() != PBDColliderType.planeY)
                 {
@@ -162,11 +150,11 @@ public class CollisionEngine
             }
         }
         //   if(colCount > 0)
-        //   Debug.Log("colCount " + colCount );
+        //   Debug.Log("colCount " + colCount);
         //  Debug.Log(count + " collisions");
     }
 
-    public void FullCollisionDetection(int[] colArr, double h, bool createConstraints)
+    public void FullCollisionDetection(int[] colArr, double h, bool createConstraints)//REAL ONE
     {
         for (int i = 0; i < colArr.Length; i++)
         {
@@ -186,7 +174,8 @@ public class CollisionEngine
                 PBDCollider iCol = allColliders[colArr[i]];
                 PBDCollider jCol = allColliders[colArr[j]];
                 //     Debug.Log("cheking " + iCol.particle.gameObject.name  + "  " + jCol.particle.gameObject.name );
-                CheckCollision(iCol, jCol, createConstraints, h);
+                if (iCol.aabb.CollidesWith(jCol.aabb))
+                    CheckCollision(iCol, jCol, createConstraints, h);
 
                 //  Debug.DrawLine(iCol.particle.position.ToVector3(), jCol.particle.position.ToVector3(), Color.yellow,0.3f);
                 count++;
@@ -215,7 +204,7 @@ public class CollisionEngine
             colCount++;
             if (createConstraints)
                 CreateConstraints(h, col);
-            // Debug.Log("col between " + a.name + " " + b.name + " " + col.correction);
+//            Debug.Log("col between " + a.name + " " + b.name + " " + col.correction);
             collisions.Add(col);
         }
     }
@@ -237,7 +226,7 @@ public class CollisionEngine
         /**/
     }
 
-    public void SeparateContacts()//TEMPORARY, SHOULD BE PARTE OF CONSTRAINT SOLVE
+    public void SeparateContacts()//TEMPORARY, SHOULD BE PART OF CONSTRAINT SOLVE
     {
         for (int i = 0; i < collisions.Count; i++)
         {

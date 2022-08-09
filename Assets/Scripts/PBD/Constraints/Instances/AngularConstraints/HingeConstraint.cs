@@ -74,11 +74,14 @@ public class HingeConstraint : PBDAngularConstraint
         return -1;
     }
 
-    protected override DoubleQuaternion GetGradientAngle(int i)
+    public override void Solve(double deltaTime)
     {
-        DoubleQuaternion rot = new DoubleQuaternion(DoubleVector3.Magnitude(deltaRotTarget), DoubleVector3.Normal(deltaRotTarget));
-        if (i == 1)
-            return rot.Inverse();
-        return rot;
+        base.Solve(deltaTime);
+        double newError = Evaluate();
+        if (newError >= 0.1)
+        {
+            Debug.Log("Hinge diverge" + newError);
+            // Debug.Break();
+        }
     }
 }

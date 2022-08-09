@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4079653673876452639}
   - component: {fileID: -4666305671471244204}
   - component: {fileID: -2334848841358340045}
+  - component: {fileID: -6754845494554413148}
   m_Layer: 0
   m_Name: HavokSphere
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 1877213096559564713}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -104,9 +105,9 @@ MonoBehaviour:
     y: 0
     z: 0
   m_PrimitiveSize:
-    x: 2
-    y: 2
-    z: 2
+    x: 1
+    y: 1
+    z: 1
   m_PrimitiveOrientation:
     Value:
       x: -0
@@ -114,15 +115,15 @@ MonoBehaviour:
       z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 2
-    Radius: 1
+    Height: 1
+    Radius: 0.5
     Axis: 2
   m_Cylinder:
-    Height: 2
-    Radius: 1
+    Height: 1
+    Radius: 0.5
     Axis: 2
   m_CylinderSideCount: 20
-  m_SphereRadius: 1
+  m_SphereRadius: 0.5
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
     m_SimplificationTolerance: 0.015
@@ -139,12 +140,12 @@ MonoBehaviour:
     m_Friction:
       m_Override: 0
       m_Value:
-        Value: 0.1
+        Value: 1
         CombineMode: 0
     m_Restitution:
       m_Override: 0
       m_Value:
-        Value: 0.4
+        Value: 1
         CombineMode: 2
     m_BelongsToCategories:
       m_Override: 0
@@ -243,9 +244,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MotionType: 0
   m_Smoothing: 0
-  m_Mass: 3
-  m_LinearDamping: 0.01
-  m_AngularDamping: 0.01
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0
   m_InitialLinearVelocity:
     x: 0
     y: 0
@@ -293,3 +294,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConversionMode: 0
+--- !u!114 &-6754845494554413148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877213096559564713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98e4e3071881c4642858b311c314d295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

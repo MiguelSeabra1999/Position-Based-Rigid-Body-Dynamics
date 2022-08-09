@@ -5,7 +5,7 @@ using UnityEngine;
 public class DataPacket
 {
     private double timeStamp;
-    private double data;
+    public double data;
 
     public DataPacket(double data)
     {

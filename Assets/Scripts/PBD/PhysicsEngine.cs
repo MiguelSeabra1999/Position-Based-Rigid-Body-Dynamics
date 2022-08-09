@@ -140,14 +140,14 @@ public class PhysicsEngine : MonoBehaviour
 
     private void ConstraintSolve(double h)
     {
-        for (int i = 0; i < constraints.Count; i++)
-        {
-            PBDConstraint constraint = constraints[i];
-            constraint.Solve(h);
-        }
         for (int i = 0; i < temporaryConstraints.Count; i++)
         {
             PBDConstraint constraint = temporaryConstraints[i];
+            constraint.Solve(h);
+        }
+        for (int i = 0; i < constraints.Count; i++)
+        {
+            PBDConstraint constraint = constraints[i];
             constraint.Solve(h);
         }
         RecalcVelocities(h);

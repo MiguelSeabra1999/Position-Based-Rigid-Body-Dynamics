@@ -70,20 +70,20 @@ public class SpawnerComparissons : MonoBehaviour
         for (int i = 0; i < dims.z; i++)
         {
             Vector3 point = startingPoint + Vector3.up * spacing * i;
-            SpawnPlaneOfSpheres(point, dims.x, dims.y);
+            SpawnPlaneOfCubes(point, dims.x, dims.y);
         }
     }
 
-    private void SpawnPlaneOfSpheres(Vector3 startingPoint, int x, int y)
+    private void SpawnPlaneOfCubes(Vector3 startingPoint, int x, int y)
     {
         for (int i = 0; i < x; i++)
         {
             Vector3 point = startingPoint + spacing * i * Vector3.right;
-            SpawnLineOfSpheres(Vector3.forward, point , y);
+            SpawnLineOfCubes(Vector3.forward, point , y);
         }
     }
 
-    private void SpawnLineOfSpheres(Vector3 axis, Vector3 startingPoint, int n)
+    private void SpawnLineOfCubes(Vector3 axis, Vector3 startingPoint, int n)
     {
         for (int i = 0; i < n; i++)
         {
@@ -124,6 +124,14 @@ public class SpawnerComparissons : MonoBehaviour
         GameObject obj = SpawnInstance(prefabSO.pbdSphere, pos, rot, pbd.transform);
         GameObject objHavok = SpawnInstance(prefabSO.havokSphere, pos, rot, havok.transform);
         GameObject objUnity = SpawnInstance(prefabSO.unitySphere, pos, rot, unity.transform);
+        return (obj, objHavok, objUnity);
+    }
+
+    private (GameObject, GameObject, GameObject)  SpawnAllVersionsWrekingBall(Vector3 pos, Quaternion rot)
+    {
+        GameObject obj = SpawnInstance(prefabSO.pbdWreckingBall, pos, rot, pbd.transform);
+        GameObject objHavok = SpawnInstance(prefabSO.havokWreckingBall, pos, rot, havok.transform);
+        GameObject objUnity = SpawnInstance(prefabSO.unityWreckingBall, pos, rot, unity.transform);
         return (obj, objHavok, objUnity);
     }
 
@@ -262,16 +270,64 @@ public class SpawnerComparissons : MonoBehaviour
                 MakeConstraint(previousObjects, objects);
         }
 
-        (GameObject, GameObject, GameObject)spheres = SpawnAllVersionsSphere(startPos + Vector3.right * dims.x, Quaternion.identity);
+        (GameObject, GameObject, GameObject)spheres = SpawnAllVersionsWrekingBall(startPos + Vector3.right * (dims.x - 0.5f), Quaternion.identity);
         MakeLastConstraint(objects, spheres);
     }
 
+    [ContextMenu("Clear")]
     private void ClearHierarchy()
     {
         int n  = transform.childCount;
         for (int i = 0; i < n; i++)
         {
             DestroyImmediate(transform.GetChild(0).gameObject);
+        }
+    }
+
+    [ContextMenu("Spawn Pyramid")]
+    private void SpawnPyramid()
+    {
+        Vector3 point = startPos;
+
+
+        for (int i = 0; i < dims.y; i++)
+        {
+            if (dims.x <= i)
+                return;
+            Vector3 midpoint  = point + ((Vector3.right + Vector3.forward) * (i + i * spacing)) * 0.25f;
+            SpawnPlaneOfCubes(midpoint, dims.x - i, dims.x - i);
+            point += Vector3.up * spacing;
+        }
+    }
+
+    [ContextMenu("Spawn8BallSetup")]
+    private void Spawn8BallSetup()
+    {
+        Vector3 basePoint = startPos;
+        for (int i = 0; i < dims.x; i++)
+        {
+            Vector3 point = basePoint + Vector3.forward * (i + i * spacing) * 0.5f;
+            for (int j = 0; j < i + 1; j++)
+            {
+                SpawnAllVersionsSphere(point, Quaternion.identity);
+                point += Vector3.back * (1 + spacing);
+            }
+            basePoint += Vector3.left * (1 + spacing);
+        }
+
+        (GameObject, GameObject, GameObject)objects = SpawnAllVersionsSphere(startPos + Vector3.right * 2, Quaternion.identity);
+        objects.Item1.GetComponent<Particle>().startingVelocity = Vector3.left * 5;
+        objects.Item3.GetComponent<Rigidbody>().velocity = Vector3.left * 5;
+    }
+
+    [ContextMenu("Spawn Line of spheres")]
+    private void SpawnLineofSpheres()
+    {
+        Vector3 point = startPos;
+        for (int i = 0; i < dims.x; i++)
+        {
+            SpawnAllVersionsSphere(point, Quaternion.identity);
+            point += Vector3.right * spacing;
         }
     }
 }

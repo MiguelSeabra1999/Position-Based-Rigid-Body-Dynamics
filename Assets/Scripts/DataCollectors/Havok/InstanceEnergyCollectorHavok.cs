@@ -17,6 +17,7 @@ public class InstanceEnergyCollectorHavok : MonoBehaviour, IConvertGameObjectToE
         {
             id = idCount
         });
+        //  Debug.Log("havok object " + gameObject.name + " is id " + idCount);
         idCount++;
     }
 }
@@ -33,6 +34,7 @@ public partial class EnergyCollectorHavokSystem : SystemBase
             .WithBurst()
             .ForEach((ref CollectEnergy collectEnergy, ref Translation t, ref Rotation r, ref PhysicsVelocity pv, ref PhysicsMass pm) =>
             {
+                //   Debug.Log("storing " + collectEnergy.id);
                 EnergyCollectorHavok.SampleVelocity(t, r, pv.Linear, pv.Angular, 1 / pm.InverseMass, pm.InverseInertia);
             }).Schedule();
     }

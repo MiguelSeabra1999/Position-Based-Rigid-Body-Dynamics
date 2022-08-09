@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4079653673876452639}
   - component: {fileID: -4666305671471244204}
   - component: {fileID: -2334848841358340045}
+  - component: {fileID: 7132630848332624698}
   m_Layer: 0
   m_Name: HavokCapsuleTrigger
   m_TagString: Untagged
@@ -244,8 +245,8 @@ MonoBehaviour:
   m_MotionType: 0
   m_Smoothing: 0
   m_Mass: 1
-  m_LinearDamping: 0.01
-  m_AngularDamping: 0.01
+  m_LinearDamping: 0
+  m_AngularDamping: 0
   m_InitialLinearVelocity:
     x: 0
     y: 0
@@ -293,3 +294,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConversionMode: 0
+--- !u!114 &7132630848332624698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877213096559564713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98e4e3071881c4642858b311c314d295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

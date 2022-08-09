@@ -17,22 +17,11 @@ public class EnergyCollectorPBD : DataCollector
 
     protected override void StepEnd()
     {
-        DataPacket data = GetTotalEnergy();
-        totalEnergy.Add(data);
-        data = GetKineticEnergy();
-        kineticEnergy.Add(data);
-        data = GetPotentialEnergy();
-        potentialEnergy.Add(data);
-    }
-
-    private DataPacket GetTotalEnergy()
-    {
-        double sum = 0;
-        foreach (Particle p in engine.allBodies)
-        {
-            sum += p.CalcTotalEnergy(PhysicsEngine.gravForce);
-        }
-        return new DataPacket(sum);
+        DataPacket dataKinetic = GetKineticEnergy();
+        kineticEnergy.Add(dataKinetic);
+        DataPacket dataPotential = GetPotentialEnergy();
+        potentialEnergy.Add(dataPotential);
+        totalEnergy.Add(new DataPacket(dataKinetic.data + dataPotential.data));
     }
 
     private DataPacket GetPotentialEnergy()
@@ -40,7 +29,8 @@ public class EnergyCollectorPBD : DataCollector
         double sum = 0;
         foreach (Particle p in engine.allBodies)
         {
-            sum += p.CalcPotentialEnergy(PhysicsEngine.gravForce);
+            if (p.inverseMass != 0)
+                sum += p.CalcPotentialEnergy(PhysicsEngine.gravForce);
         }
         return new DataPacket(sum);
     }

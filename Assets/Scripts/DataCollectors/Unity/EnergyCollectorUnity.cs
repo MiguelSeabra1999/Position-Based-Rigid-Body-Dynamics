@@ -46,7 +46,8 @@ public class EnergyCollectorUnity : MonoBehaviour
         {
             Rigidbody rb = transform.GetChild(i).GetComponent<Rigidbody>();
             if (rb != null)
-                sum += CalcPotentialEnergy(rb);
+                if (!rb.isKinematic)
+                    sum += CalcPotentialEnergy(rb);
         }
         return new DataPacket(sum);
     }
@@ -80,6 +81,10 @@ public class EnergyCollectorUnity : MonoBehaviour
 
     public double CalcPotentialEnergy(Rigidbody rb)
     {
+        if (rb.isKinematic)
+            return 0;
+        if (!rb.gameObject.activeInHierarchy)
+            return 0;
         return rb.mass * 9.8f *  rb.transform.position.y;
     }
 

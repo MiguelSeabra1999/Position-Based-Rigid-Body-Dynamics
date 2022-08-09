@@ -62,7 +62,7 @@ MonoBehaviour:
   allBodies: []
   allParticles: []
   allRigidbodies: []
-  substeps: 5
+  substeps: 20
   distanceConstraints: []
   ballJointConstraint: []
   twistConstraint: []
