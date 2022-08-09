@@ -12,24 +12,24 @@ public class PBDColliderPlaneY : PBDCollider
         aabb = new AABB(neg, pos);
     }
 
-    public override bool CheckCollision(PBDColliderSphere other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderSphere other,  PBDCollision collision)
     {
-        return CheckCollision(this, other , ref collision);
+        return CheckCollision(this, other ,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderPlaneY other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderPlaneY other,  PBDCollision collision)
     {
-        return CheckCollision(this, other , ref collision);
+        return CheckCollision(this, other ,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderCapsule other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderCapsule other,  PBDCollision collision)
     {
-        return CheckCollision(this, other , ref collision);
+        return CheckCollision(this, other ,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderBox other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderBox other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
     public override PBDColliderType GetColliderType()

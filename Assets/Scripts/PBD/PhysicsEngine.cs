@@ -9,7 +9,7 @@ public class PhysicsEngine : MonoBehaviour
     public bool stepByStep = false;
     public bool optimizeCollisionDetection = true;
     public bool performBroadPhaseOncePerSimStep = false;
-    public double minimumVelocity = 0.1;
+
     public bool storeTotalEnergy;
     public AnimationCurve totalEnergyPlot = new AnimationCurve();
     private bool instantSeperateContacts = false;
@@ -87,17 +87,18 @@ public class PhysicsEngine : MonoBehaviour
 
             collisionEngine.Clear();
             //temporaryConstraints.Clear();
-            foreach (Particle particle in allBodies)
-                particle.PBDphysicsUpdate();
+
+            for (int i = 0; i < allBodies.Length; i++)
+                allBodies[i].PBDphysicsUpdate();
             // ClampVelocity(h);
         }
         UpdateActualPositions();
 
 
-        foreach (Particle particle in allBodies)
-            particle.PBDupdate();
-        if (storeTotalEnergy)
-            StoreTotalEnergy();
+        for (int i = 0; i < allBodies.Length; i++)
+            allBodies[i].PBDupdate();
+        /*    if (storeTotalEnergy)
+                StoreTotalEnergy();*/
         if (stepByStep)
             Pause();
         physicsStepEnd?.Invoke();
@@ -106,10 +107,9 @@ public class PhysicsEngine : MonoBehaviour
 
     private void VelocitySolve(double h)
     {
-        for (int i = 0; i <  collisionEngine.collisions.Count; i++)
-        {
-            collisionEngine.collisions[i].HandleCollision(h);
-        }
+        collisionEngine.LoopCollisions(
+            (c) => c.HandleCollision(h)
+        );
     }
 
     private void RecalcVelocities(double h)
@@ -165,42 +165,34 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    private void ClampVelocity(double h)
-    {
-        foreach (Particle particle in allBodies)
-        {
-            if (DoubleVector3.MagnitudeSqr(particle.velocity) < minimumVelocity * minimumVelocity)
-            {
-                particle.velocity = new DoubleVector3(0, 0, 0);
-            }
-        }
-    }
-
     private void UpdateActualPositions()
     {
-        foreach (PBDParticle particle in allParticles)
+        for (int i = 0; i < allParticles.Length; i++)
         {
-            particle.transform.position = particle.position.ToVector3();
+            allParticles[i].transform.position = allParticles[i].position.ToVector3();
         }
-        foreach (PBDRigidbody particle in allRigidbodies)
+
+        for (int i = 0; i < allRigidbodies.Length; i++)
         {
-            particle.transform.position = particle.position.ToVector3();
-            particle.transform.rotation = particle.orientation.ToQuaternion().normalized;
+            allRigidbodies[i].transform.position = allRigidbodies[i].position.ToVector3();
+            allRigidbodies[i].transform.rotation = allRigidbodies[i].orientation.ToQuaternion().normalized;
         }
     }
 
     private void StoreColliders()
     {
         List<PBDCollider> cols = new List<PBDCollider>();
-        foreach (PBDParticle particle in allParticles)
+
+        for (int i = 0; i < allParticles.Length; i++)
         {
-            if (particle.pbdCollider != null)
-                cols.Add(particle.pbdCollider);
+            if (allParticles[i].pbdCollider != null)
+                cols.Add(allParticles[i].pbdCollider);
         }
-        foreach (PBDRigidbody particle in allRigidbodies)
+
+        for (int i = 0; i < allRigidbodies.Length; i++)
         {
-            if (particle.pbdCollider != null)
-                cols.Add(particle.pbdCollider);
+            if (allRigidbodies[i].pbdCollider != null)
+                cols.Add(allRigidbodies[i].pbdCollider);
         }
 
         collisionEngine.StoreColliders(cols);

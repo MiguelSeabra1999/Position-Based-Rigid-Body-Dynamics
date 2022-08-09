@@ -16,7 +16,7 @@ public class TestCubeCollisions : MonoBehaviour
     {
         cols = GetComponentsInChildren<PBDColliderBox>();
         rbs = GetComponentsInChildren<PBDRigidbody>();
-        for(int i = 0; i < cols.Length; i++)
+        for (int i = 0; i < cols.Length; i++)
         {
             rends.Add(cols[i].gameObject.GetComponent<Renderer>());
         }
@@ -26,48 +26,46 @@ public class TestCubeCollisions : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach(PBDRigidbody rb in rbs)
+        foreach (PBDRigidbody rb in rbs)
         {
             rb.position = new DoubleVector3(rb.transform.position);
             rb.orientation = new DoubleQuaternion(rb.transform.rotation);
             rb.UpdateAxes();
         }
-        for(int i = 0; i < cols.Length; i++)
+        for (int i = 0; i < cols.Length; i++)
         {
-         //   ((PBDRigidbody)cols[i].particle).orientation = new DoubleQuaternion(transform.rotation);
+            //   ((PBDRigidbody)cols[i].particle).orientation = new DoubleQuaternion(transform.rotation);
             /*((PBDRigidbody)cols[i].particle).forward = new DoubleVector3(transform.forward);
             ((PBDRigidbody)cols[i].particle).right = new DoubleVector3(transform.right);
             ((PBDRigidbody)cols[i].particle).up = new DoubleVector3(transform.up);*/
-           // ((PBDRigidbody)cols[i].particle).UpdateAxes();
-            
+            // ((PBDRigidbody)cols[i].particle).UpdateAxes();
         }
 
 
         ResetColor();
         CheckCollisions();
     }
+
     private void CheckCollisions()
     {
-        for(int i = 0; i < cols.Length; i++)
+        for (int i = 0; i < cols.Length; i++)
         {
-            for(int j = i + 1; j < cols.Length; j++)
+            for (int j = i + 1; j < cols.Length; j++)
             {
-               
-                bool collided = cols[i].CheckCollision(cols[j], ref col);
+                bool collided = cols[i].CheckCollision(cols[j],  col);
                 //Debug.Log(collided);
-                if(collided)
+                if (collided)
                 {
                     rends[i].material.color = collisionColor;
                     rends[j].material.color = collisionColor;
                 }
-                    
             }
         }
     }
 
     private void ResetColor()
     {
-        foreach(Renderer r in rends)
+        foreach (Renderer r in rends)
         {
             r.material.color = normalColor;
         }
@@ -81,11 +79,10 @@ public class TestCubeCollisions : MonoBehaviour
         col.b.transform.position = col.b.position.ToVector3();
     }
 
-
- /*   private void Seperate()//Deprecated
-    {
-        col.Separate();
-        col.a.transform.position = col.a.position.ToVector3();
-        col.b.transform.position = col.b.position.ToVector3();
-    }*/
+    /*   private void Seperate()//Deprecated
+       {
+           col.Separate();
+           col.a.transform.position = col.a.position.ToVector3();
+           col.b.transform.position = col.b.position.ToVector3();
+       }*/
 }

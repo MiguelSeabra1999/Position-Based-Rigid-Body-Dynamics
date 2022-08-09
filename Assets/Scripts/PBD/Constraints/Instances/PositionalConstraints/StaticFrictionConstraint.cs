@@ -11,11 +11,29 @@ public class StaticFrictionConstraint : PBDConstraint
     private double error;
 
 
+    public StaticFrictionConstraint() {}
     public StaticFrictionConstraint(PBDCollision col, NonPenetrationConstraint normalConstraint, PBDFrictionCollision frictionCollision)
     {
         this.col = col;
         bodies.Add(col.a);
         bodies.Add(col.b);
+        this.normalConstraint = normalConstraint;
+        this.frictionCol = frictionCollision;
+    }
+
+    public void SetNewValue(PBDCollision col, NonPenetrationConstraint normalConstraint, PBDFrictionCollision frictionCollision)
+    {
+        if (bodies.Count == 0)
+        {
+            bodies.Add(col.a);
+            bodies.Add(col.b);
+        }
+        else
+        {
+            bodies[0] = col.a;
+            bodies[1] = col.b;
+        }
+        this.col = col;
         this.normalConstraint = normalConstraint;
         this.frictionCol = frictionCollision;
     }

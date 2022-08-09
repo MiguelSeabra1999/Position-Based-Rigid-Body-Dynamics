@@ -7,11 +7,27 @@ public class NonPenetrationConstraint : PBDConstraint
 {
     public PBDCollision col;
 
+    public NonPenetrationConstraint() {}
     public NonPenetrationConstraint(PBDCollision col)
     {
         this.col = col;
         bodies.Add(col.a);
         bodies.Add(col.b);
+    }
+
+    public void SetNewValue(PBDCollision col)
+    {
+        if (bodies.Count == 0)
+        {
+            bodies.Add(col.a);
+            bodies.Add(col.b);
+        }
+        else
+        {
+            bodies[0] = col.a;
+            bodies[1] = col.b;
+        }
+        this.col = col;
     }
 
     protected override DoubleVector3 GetGradient(int bodyIndex)

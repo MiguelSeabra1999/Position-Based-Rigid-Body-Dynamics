@@ -8,8 +8,8 @@ public class PBDRigidbody : Particle
     [SerializeField] private Vector3 startingAngularVelocity;
     public DoubleQuaternion orientation;
     public DoubleVector3 angularVelocity;
-    private Matrix3x3 inertiaTensor = new Matrix3x3();
-    private Matrix3x3 inertiaTensorInverted = new Matrix3x3();
+    private Matrix3x3 inertiaTensor = Matrix3x3.Identity();
+    private Matrix3x3 inertiaTensorInverted = Matrix3x3.Identity();
     public DoubleQuaternion prevOrientation;
     public DoubleVector3 prevAngularVelocity;
     private DoubleVector3 externalTorque = new DoubleVector3(0, 0, 0);

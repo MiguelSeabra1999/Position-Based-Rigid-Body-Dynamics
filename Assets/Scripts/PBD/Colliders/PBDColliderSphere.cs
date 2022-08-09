@@ -18,7 +18,7 @@ public class PBDColliderSphere : PBDCollider
     {
         // return new Matrix3x3();
         // return new Matrix3x3() * particle.mass;
-        Matrix3x3 I = new Matrix3x3();
+        Matrix3x3 I = Matrix3x3.Identity();
         I = I * (2.0 / 5.0) * particle.mass * radius * radius;
 
         return I;
@@ -33,24 +33,24 @@ public class PBDColliderSphere : PBDCollider
         return I;*/
     }
 
-    public override bool CheckCollision(PBDColliderSphere other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderSphere other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderCapsule other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderCapsule other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderBox other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderBox other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderPlaneY other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderPlaneY other,  PBDCollision collision)
     {
-        return CheckCollision(other, this , ref collision);
+        return CheckCollision(other, this ,  collision);
     }
 
     public override PBDColliderType GetColliderType()

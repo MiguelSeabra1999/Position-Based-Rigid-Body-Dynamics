@@ -8,6 +8,7 @@ public class PBDColliderBox : PBDCollider
     public DoubleVector3 halfDims;
     [HideInInspector] public double diagonal;
     private Color color;
+    private DoubleVector3[] points = new DoubleVector3[8];
     void OnDrawGizmos()
     {
         Gizmos.color = color;
@@ -24,37 +25,43 @@ public class PBDColliderBox : PBDCollider
 
     public override void CalcBoundingBox()
     {
-        DoubleVector3[] points = new DoubleVector3[8];
+        //DoubleVector3[] points = new DoubleVector3[8];
         GetVertices(ref points);
-        double[] min = new double[] {points[0].x, points[0].y, points[0].z};
-        double[] max = new double[] {points[0].x, points[0].y, points[0].z};
-        foreach (DoubleVector3 p in points)
+
+        double min0 = points[0].x;
+        double min1 = points[0].y;
+        double min2 = points[0].z;
+        double max0 = points[0].x;
+        double max1 = points[0].y;
+        double max2 = points[0].z;
+
+        for (int p = 0; p < points.Length; p++)
         {
-            for (int i = 0; i < 3; i++)
-            {
-                if (min[i] < p[i])
-                    min[i] = p[i];
-                if (max[i] > p[i])
-                    max[i] = p[i];
-            }
+            if (min0 < points[p][0])
+                min0 = points[p][0];
+            if (max0 > points[p][0])
+                max0 = points[p][0];
+            if (min1 < points[p][1])
+                min1 = points[p][1];
+            if (max1 > points[p][1])
+                max1 = points[p][1];
+            if (min2 < points[p][2])
+                min2 = points[p][2];
+            if (max2 > points[p][2])
+                max2 = points[p][2];
         }
 
 
-        DoubleVector3 pos = new DoubleVector3(min[0], min[1], min[2]);
-        DoubleVector3 neg = new DoubleVector3(max[0], max[1], max[2]);
+        DoubleVector3 pos = new DoubleVector3(min0, min1, min2);
+        DoubleVector3 neg = new DoubleVector3(max0, max1, max2);
         aabb = new AABB(neg, pos);
-    }
-
-    public override void SeparateAdjustment(DoubleVector3 normal)
-    {
-        // CleanAxesRotation(normal);
     }
 
     public override Matrix3x3 GetInertiaTensor()
     {
         //   return new Matrix3x3();
 
-        Matrix3x3 I = new Matrix3x3();
+        Matrix3x3 I = Matrix3x3.Identity();
         double side = halfDims[0] * 2.0;
 
         I = particle.mass * ((side * side) / 6.0) * I;
@@ -64,30 +71,7 @@ public class PBDColliderBox : PBDCollider
     public override Matrix3x3 GetInertiaTensorInverted()
     {
         return GetInertiaTensor().GetInverse();
-        /*Matrix3x3 I = GetInertiaTensorFraction();
-        double side = halfDims[0] * 2.0;
-
-        I = I * particle.inverseMass * (side * side);
-        return I;*/
     }
-
-    /* private Matrix3x3 GetInertiaTensorFraction()
-     {
-         Matrix3x3 I = new Matrix3x3();
-
-         double twoThirds = 2.0 / 3.0;
-         double minusOneFourth = -1.0 / 4.0;
-         I[0] = twoThirds;
-         I[1] = minusOneFourth;
-         I[2] = minusOneFourth;
-         I[3] = minusOneFourth;
-         I[4] = twoThirds;
-         I[5] = minusOneFourth;
-         I[6] = minusOneFourth;
-         I[7] = minusOneFourth;
-         I[8] = twoThirds;
-         return I;
-     }*/
 
     public DoubleVector3 GetClosestPointOnSurface(DoubleVector3 p)
     {
@@ -197,24 +181,24 @@ public class PBDColliderBox : PBDCollider
         return new DoubleVector3(projectionX, projectionY, projectionZ);
     }
 
-    public override bool CheckCollision(PBDColliderSphere other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderSphere other,  PBDCollision collision)
     {
-        return CheckCollision(other, this, ref collision);
+        return CheckCollision(other, this,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderCapsule other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderCapsule other,  PBDCollision collision)
     {
-        return CheckCollision(other, this, ref collision);
+        return CheckCollision(other, this,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderPlaneY other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderPlaneY other,  PBDCollision collision)
     {
-        return CheckCollision(other, this, ref collision);
+        return CheckCollision(other, this,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderBox other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderBox other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
     public override PBDColliderType GetColliderType()
@@ -222,7 +206,7 @@ public class PBDColliderBox : PBDCollider
         return PBDColliderType.box;
     }
 
-    public static PBDCollision CreateCollision(PBDColliderBox self, PBDColliderBox other, double[] separatingDistances, DoubleVector3[] separatingAxes)
+    public static PBDCollision CreateCollision(PBDColliderBox self, PBDColliderBox other, double[] separatingDistances, DoubleVector3[] separatingAxes, PBDCollision col)
     {
         /*  DoubleVector3 collisionPoint = other.GetClosestPoint(self.particle.position);
           DoubleVector3 otherCollisionPoint = self.GetClosestPoint(other.particle.position);*/
@@ -269,7 +253,7 @@ public class PBDColliderBox : PBDCollider
         self.pos = collisionPoint.ToVector3();
 
         //other.pos = otherCollisionPoint.ToVector3();
-        PBDCollision col = new PBDCollision(self.particle, other.particle, normal, correction, collisionPoint /*, otherCollisionPoint*/);
+        col.LoadNewValues(self.particle, other.particle, normal, correction, collisionPoint /*, otherCollisionPoint*/);
         col.hasFriction = useFriction;
         return col;
     }
@@ -280,7 +264,7 @@ public class PBDColliderBox : PBDCollider
         int axis = 0;
         if (IsParallelWithAxis(other, normal))
         {
-            //  Debug.Log("parallel" + normal);
+            Debug.Log("parallel" + normal);
             other.HasParallelAxis(normal, ref axis);
             otherCollisionPoint = other.GetFurthestFaceAlongDirection(-normal,  axis);
             HasParallelAxis(normal, ref axis);
@@ -300,11 +284,11 @@ public class PBDColliderBox : PBDCollider
         if (other.HasPerpendicularEdge(normal, ref axis))
         {
             collisionPoint = other.GetFurthestEdgeAlongDirection(offset, axis);
-            //  Debug.Log("PERP");
+            Debug.Log("PERP");
             return collisionPoint;
         }
         useFriction = false;
-        // Debug.Log("point");
+        Debug.Log("point");
         return other.GetFurthestPointAlongDirection(normal);
 
         //   Debug.LogError("No colission point was found between " + gameObject.name + " and " + other.gameObject.name);
@@ -606,18 +590,18 @@ public class PBDColliderBox : PBDCollider
             return GetFurthestEdgeAlongDirection(up, axis);
         }
 
-        DoubleVector3[] points = new DoubleVector3[8];
+        //DoubleVector3[] points = new DoubleVector3[8];
         GetVertices(ref points);
 
         DoubleVector3 lowestPoint = points[0];
 
-        foreach (DoubleVector3 point in points)
+        for (int i = 0; i < points.Length; i++)
         {
-            if (point.y < lowestPoint.y)
+            if (points[i].y < lowestPoint.y)
             {
-                lowestPoint = point;
+                lowestPoint = points[i];
             }
-            if (point.y == lowestPoint.y)
+            if (points[i].y == lowestPoint.y)
             {
             }
         }
@@ -639,12 +623,12 @@ public class PBDColliderBox : PBDCollider
             axis = 0;
         DoubleVector3 thirdAxis = axes[axis] * halfDims[axis];
 
-        DoubleVector3[] points = new DoubleVector3[4];
+        //  DoubleVector3[] points = new DoubleVector3[4];
         points[0] = secondAxis + thirdAxis;
         points[1] = secondAxis - thirdAxis;
         points[2] = -secondAxis + thirdAxis;
         points[3] = -secondAxis - thirdAxis;
-        return GetFurthestPointFromListAlongDirection(points, dir);
+        return GetFurthestPointFromListAlongDirection(points, dir, 4);
     }
 
     private DoubleVector3 GetFurthestFaceAlongDirection(DoubleVector3 dir,  int axis)
@@ -663,21 +647,23 @@ public class PBDColliderBox : PBDCollider
 
     private DoubleVector3 GetFurthestPointAlongDirection(DoubleVector3 dir)
     {
-        DoubleVector3[] points = new DoubleVector3[8];
+        //     DoubleVector3[] points = new DoubleVector3[8];
         GetVerticesVectors(ref points);
-        return GetFurthestPointFromListAlongDirection(points, dir);
+        return GetFurthestPointFromListAlongDirection(points, dir, 8);
     }
 
-    private DoubleVector3 GetFurthestPointFromListAlongDirection(DoubleVector3[] points, DoubleVector3 dir)
+    private DoubleVector3 GetFurthestPointFromListAlongDirection(DoubleVector3[] points, DoubleVector3 dir, int index)
     {
         DoubleVector3 furthestPoint = points[0];
+        dir = DoubleVector3.Normal(dir);
         double furthestDot = DoubleVector3.Dot(DoubleVector3.Normal(points[0]), dir);
-        foreach (DoubleVector3 point in points)
+
+        for (int i = 0; i < index; i++)
         {
-            double dot = DoubleVector3.Dot(DoubleVector3.Normal(point), dir);
+            double dot = DoubleVector3.Dot(DoubleVector3.Normal(points[i]), dir);
             if (dot < furthestDot)
             {
-                furthestPoint = point;
+                furthestPoint = points[i];
                 furthestDot = dot;
             }
         }
@@ -686,7 +672,7 @@ public class PBDColliderBox : PBDCollider
 
     public void GetVertices(ref DoubleVector3[] points)
     {
-        points = new DoubleVector3[8];
+        //points = new DoubleVector3[8];
         points[0] = particle.position + particle.right * halfDims.x +   particle.up * halfDims.y +      particle.forward * halfDims.z;
         points[1] = particle.position + particle.right * halfDims.x +   particle.up * halfDims.y +      -1 * particle.forward * halfDims.z;
         points[2] = particle.position + particle.right * halfDims.x +   -1 * particle.up * halfDims.y +   particle.forward * halfDims.z;
@@ -699,7 +685,7 @@ public class PBDColliderBox : PBDCollider
 
     public void GetVerticesVectors(ref DoubleVector3[] points)
     {
-        points = new DoubleVector3[8];
+        // points = new DoubleVector3[8];
         points[0] = particle.right * halfDims.x +   particle.up * halfDims.y +      particle.forward * halfDims.z;
         points[1] = particle.right * halfDims.x +   particle.up * halfDims.y +      -1 * particle.forward * halfDims.z;
         points[2] = particle.right * halfDims.x +   -1 * particle.up * halfDims.y +   particle.forward * halfDims.z;

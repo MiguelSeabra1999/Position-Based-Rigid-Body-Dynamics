@@ -6,12 +6,12 @@ using UnityEngine;
 
 public  class PBDCollision
 {
-    public readonly Particle a;
-    public readonly Particle b;
-    public readonly DoubleVector3 normal;
-    public readonly DoubleVector3 correction;
-    public readonly DoubleVector3 collisionPoint;
-    public readonly DoubleVector3 otherCollisionPoint;
+    public  Particle a;
+    public  Particle b;
+    public  DoubleVector3 normal;
+    public  DoubleVector3 correction;
+    public  DoubleVector3 collisionPoint;
+    public  DoubleVector3 otherCollisionPoint;
 
 
     public  DoubleVector3 deltaVel;
@@ -20,13 +20,40 @@ public  class PBDCollision
     public double wa, wb;
 
     public DoubleVector3 rA, rB, rAworld, rBworld;
-    private DoubleVector3 velocityAtCollisionPointA, velocityAtCollisionPointB, relativeVelocity, velocityTangent, prevVelocityAtCollisionPointA, prevVelocityAtCollisionPointB, prevRelativeVelocity, prevVelocityTangent;
-    private double velocityNormal, prevVelocityNormal;
+    public DoubleVector3 velocityAtCollisionPointA, velocityAtCollisionPointB, relativeVelocity, velocityTangent, prevVelocityAtCollisionPointA, prevVelocityAtCollisionPointB, prevRelativeVelocity, prevVelocityTangent;
+    public double velocityNormal, prevVelocityNormal;
     public PBDFrictionCollision frictionCol;
     public bool hasFriction = true;
 
+    public PBDCollision()
+    {
+    }
 
-    public PBDCollision(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint)
+    /* public PBDCollision(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint)
+     {
+         this.collisionPoint = collisionPoint;
+         this.otherCollisionPoint = collisionPoint;
+         this.a = a;
+         this.b = b;
+         this.normal = normal;
+         this.correction = correction;
+         InitCollision();
+         CalculateRelativeVelocities();
+     }
+
+     public PBDCollision(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint, DoubleVector3 otherCollisionPoint)
+     {
+         this.collisionPoint = collisionPoint;
+         this.otherCollisionPoint = otherCollisionPoint;
+         this.a = a;
+         this.b = b;
+         this.normal = normal;
+         this.correction = correction;
+         InitCollision();
+         CalculateRelativeVelocities();
+     }*/
+
+    public void LoadNewValues(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint)
     {
         this.collisionPoint = collisionPoint;
         this.otherCollisionPoint = collisionPoint;
@@ -38,7 +65,7 @@ public  class PBDCollision
         CalculateRelativeVelocities();
     }
 
-    public PBDCollision(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint, DoubleVector3 otherCollisionPoint)
+    public void LoadNewValues(Particle a, Particle b, DoubleVector3 normal, DoubleVector3 correction, DoubleVector3 collisionPoint, DoubleVector3 otherCollisionPoint)
     {
         this.collisionPoint = collisionPoint;
         this.otherCollisionPoint = otherCollisionPoint;
@@ -48,8 +75,37 @@ public  class PBDCollision
         this.correction = correction;
         InitCollision();
         CalculateRelativeVelocities();
+    }
 
-        // CalculateRelativeVelocities();
+    public void CopyInto(PBDCollision c)
+    {
+        this.a = c.a;
+        this.b = c.b;
+        this.normal = c.normal;
+        this.correction = c.correction;
+        this.collisionPoint = c.collisionPoint;
+        this.otherCollisionPoint = c.otherCollisionPoint;
+        this.deltaVel = c.deltaVel;
+        this.percent = c.percent;
+        this.massSum = c.massSum;
+        this.wa = c.wa;
+        this.wb = c.wb;
+        this.rA = c.rA;
+        this.rB = c.rB;
+        this.rAworld = c.rAworld;
+        this.rBworld = c.rBworld;
+        this.velocityAtCollisionPointA = c.velocityAtCollisionPointA;
+        this.velocityAtCollisionPointB = c.velocityAtCollisionPointB;
+        this.relativeVelocity = c.relativeVelocity;
+        this.velocityTangent = c.velocityTangent;
+        this.prevVelocityAtCollisionPointA = c.prevVelocityAtCollisionPointA;
+        this.prevVelocityAtCollisionPointB = c.prevVelocityAtCollisionPointB;
+        this.prevRelativeVelocity = c.prevRelativeVelocity;
+        this.prevVelocityTangent = c.prevVelocityTangent;
+        this.velocityNormal = c.velocityNormal;
+        this.prevVelocityNormal = c.prevVelocityNormal;
+        this.frictionCol = c.frictionCol;
+        this.hasFriction = c.hasFriction;
     }
 
     private void InitCollision()
@@ -97,12 +153,6 @@ public  class PBDCollision
         Debug.DrawLine(a.position.ToVector3(), (a.position + rAworld).ToVector3(), Color.yellow, 0.001f);
         Debug.DrawLine(b.position.ToVector3(), (b.position + rBworld).ToVector3(), Color.yellow, 0.001f);
   /**/
-    }
-
-    public PBDCollision GetInverse()
-    {
-        PBDCollision newCol = new PBDCollision(b, a, -normal, -correction, otherCollisionPoint, collisionPoint);
-        return newCol;
     }
 
     public void Separate()//deprecated

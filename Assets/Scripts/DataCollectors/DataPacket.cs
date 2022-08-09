@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DataPacket
+public struct DataPacket
 {
     private double timeStamp;
     public double data;

@@ -22,6 +22,7 @@ public abstract class Particle : MonoBehaviour
     public DoubleVector3 forward = new DoubleVector3(0, 0, 1);
     public DoubleVector3 up = new DoubleVector3(0, 1, 0);
     public DoubleVector3 right = new DoubleVector3(1, 0, 0);
+    private DoubleVector3[] axes = new DoubleVector3[3];
 
     /*     public double normalForceLargrangeMult;
      public bool appliedStaticFriction;*/
@@ -156,7 +157,6 @@ public abstract class Particle : MonoBehaviour
 
     public DoubleVector3[] GetAxes()
     {
-        DoubleVector3[] axes = new DoubleVector3[3];
         /**/
         axes[0] = right;
         axes[1] = up;
@@ -194,14 +194,14 @@ public abstract class Particle : MonoBehaviour
     {
         if (pbdCollider != null)
             return pbdCollider.GetInertiaTensorInverted();
-        return new Matrix3x3();
+        return Matrix3x3.Identity();
     }
 
     public virtual Matrix3x3 GetInertiaTensor()
     {
         if (pbdCollider != null)
             return pbdCollider.GetInertiaTensor();
-        return new Matrix3x3();
+        return Matrix3x3.Identity();
     }
 
     public double CalcLinearMomentum()

@@ -10,20 +10,38 @@ public class CollisionEngine
     public PBDCollider[] allColliders;
     public PBDCollider[] excludedColliders;
 
-    public List<PBDCollision> collisions = new List<PBDCollision>();
-    public PBDCollision[] collisionsBackup;
-    private List<PBDCollision>  possibleCollisions;
+    private List<PBDCollision> collisions = new List<PBDCollision>();
+    private NonPenetrationConstraint nonPenetrationConstraint = new NonPenetrationConstraint();
+    private StaticFrictionConstraint staticFrictionConstraint = new StaticFrictionConstraint();
+    public int colLen = 0;
 
     private BVH_node root;
-    private  PBDCollision  col;
+    private  PBDCollision  col = new PBDCollision();
     public int count = 0;
     public int colCount = 0;
     bool[,] checkedCols;
 
+    private void AddCollisionToList(PBDCollision collision)
+    {
+        if (collisions.Count <= colLen)
+            collisions.Add(new PBDCollision());
+
+        collisions[colLen].CopyInto(collision);
+        colLen++;
+    }
+
+    public void LoopCollisions(Action<PBDCollision> doWork)
+    {
+        for (int i = 0; i < colLen; i++)
+        {
+            doWork(collisions[i]);
+        }
+    }
+
     public void Clear()
     {
-        collisions.Clear();
-
+        //collisions.Clear();
+        colLen = 0;
         for (int i = 0; i < allColliders.Length; i++)
             for (int j = 0; j < allColliders.Length; j++)
                 checkedCols[i, j] = false;
@@ -34,7 +52,6 @@ public class CollisionEngine
 
     public void Reset()
     {
-        possibleCollisions.Clear();
         Clear();
     }
 
@@ -198,32 +215,29 @@ public class CollisionEngine
 
     private void CheckCollision(PBDCollider a, PBDCollider b, bool createConstraints, double h)
     {
-        bool collided = a.CheckCollision(b, ref col);
+        bool collided = a.CheckCollision(b,  col);
         if (collided)
         {
             colCount++;
             if (createConstraints)
                 CreateConstraints(h, col);
 //            Debug.Log("col between " + a.name + " " + b.name + " " + col.correction);
-            collisions.Add(col);
+            AddCollisionToList(col);
         }
     }
 
     public void CreateConstraints(double h, PBDCollision collision)
     {
-        NonPenetrationConstraint nonPenetrationConstraint = new NonPenetrationConstraint(collision);
-        //temporaryConstraints.Add(nonPenetrationConstraint);
+        nonPenetrationConstraint.SetNewValue(collision);
+        // NonPenetrationConstraint nonPenetrationConstraint = new NonPenetrationConstraint(collision);
         nonPenetrationConstraint.Solve(h);
-
 
         if (!collision.hasFriction)
             return;
-        /**/
-        StaticFrictionConstraint staticFrictionConstraint = new StaticFrictionConstraint(collision, nonPenetrationConstraint, collision.frictionCol);
-        //StaticFrictionConstraint staticFrictionConstraint2 = new StaticFrictionConstraint( col.GetInverse(), nonPenetrationConstraint, col.frictionPair.frictionCol2);
+
+        staticFrictionConstraint.SetNewValue(collision, nonPenetrationConstraint, collision.frictionCol);
+        //StaticFrictionConstraint staticFrictionConstraint = new StaticFrictionConstraint(collision, nonPenetrationConstraint, collision.frictionCol);
         staticFrictionConstraint.Solve(h);
-        //staticFrictionConstraint2.Solve(h);
-        /**/
     }
 
     public void SeparateContacts()//TEMPORARY, SHOULD BE PART OF CONSTRAINT SOLVE

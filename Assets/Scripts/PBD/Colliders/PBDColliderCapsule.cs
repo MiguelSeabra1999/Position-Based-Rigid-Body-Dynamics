@@ -58,7 +58,7 @@ public class PBDColliderCapsule : PBDCollider
         //return new Matrix3x3();
         // return new Matrix3x3() * particle.mass;
 
-        Matrix3x3 I = new Matrix3x3();
+        Matrix3x3 I = Matrix3x3.Identity();
 
         double massCylinder = length * radius * radius * Math.PI;
         double massHemisphere = 2.0 * radius * radius * radius * Math.PI / 3.0;
@@ -122,24 +122,24 @@ public class PBDColliderCapsule : PBDCollider
         return (a, b);
     }
 
-    public override bool CheckCollision(PBDColliderPlaneY other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderPlaneY other,  PBDCollision collision)
     {
-        return CheckCollision(other, this , ref collision);
+        return CheckCollision(other, this ,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderSphere other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderSphere other,  PBDCollision collision)
     {
-        return CheckCollision(other, this, ref collision);
+        return CheckCollision(other, this,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderCapsule other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderCapsule other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
-    public override bool CheckCollision(PBDColliderBox other, ref PBDCollision collision)
+    public override bool CheckCollision(PBDColliderBox other,  PBDCollision collision)
     {
-        return CheckCollision(this, other, ref collision);
+        return CheckCollision(this, other,  collision);
     }
 
     public override PBDColliderType GetColliderType()

@@ -18,9 +18,8 @@ public class CollisionCollector : DataCollector
 
     protected override void SubstepEnd()
     {
-        foreach (PBDCollision col in collisionEngine.collisions)
-        {
-            collisionTimeStamps.Add(new DataPacket(0));
-        }
+        collisionEngine.LoopCollisions(
+            (c) => collisionTimeStamps.Add(new DataPacket(0))
+        );
     }
 }
