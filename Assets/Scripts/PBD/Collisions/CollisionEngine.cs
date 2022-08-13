@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System;
 using System.Security.Cryptography;
 using System.Collections;
@@ -16,10 +17,40 @@ public class CollisionEngine
     public int colLen = 0;
 
     private BVH_node root;
+
+    private List<BVH_node> nodes = new List<BVH_node>();
+    private int nodeCount = 0;
     private  PBDCollision  col = new PBDCollision();
     public int count = 0;
     public int colCount = 0;
     bool[,] checkedCols;
+
+    public BVH_node GetNewNode(int[] colliders)
+    {
+        if (nodes.Count <= nodeCount)
+            nodes.Add(new BVH_node(this));
+
+        nodes[nodeCount].SetNewValues(colliders);
+
+        nodeCount++;
+        return nodes[nodeCount - 1];
+    }
+
+    public BVH_node GetNewNode(int n)
+    {
+        if (nodes.Count <= nodeCount)
+            nodes.Add(new BVH_node(this));
+
+        nodes[nodeCount].SetNewValues(n);
+
+        nodeCount++;
+        return nodes[nodeCount - 1];
+    }
+
+    private void ClearNodes()
+    {
+        nodeCount = 0;
+    }
 
     private void AddCollisionToList(PBDCollision collision)
     {
@@ -81,7 +112,7 @@ public class CollisionEngine
         if (allColliders.Length == 0)
             return;
         UpdateAABBS();
-        root = new BVH_node(this, allColliders.Length);
+        root = GetNewNode(allColliders.Length);
         BroadCollisionDetectionRecursive(root, 0);
     }
 
@@ -103,9 +134,18 @@ public class CollisionEngine
         colCount = 0;
         //  Debug.Log("----------");
         NarrowCollisionDetectionRecursive(root, createConstraints, h);
-
-
         CheckCollisionWithPlane(createConstraints, h);
+    }
+
+    public void NarrowCollisionDetection(bool createConstraints, double h, List<List<Correction>> corrections)
+    {
+        if (allColliders.Length == 0)
+            return;
+        count = 0;
+        colCount = 0;
+        //  Debug.Log("----------");
+        NarrowCollisionDetectionRecursive(root, createConstraints, h, corrections);
+        CheckCollisionWithPlane(createConstraints, h, corrections);
     }
 
     public void NarrowCollisionDetectionRecursive(BVH_node node, bool createConstraints, double h)
@@ -127,6 +167,27 @@ public class CollisionEngine
             NarrowCollisionDetectionRecursive(node.firstSon, createConstraints, h);
         if (node.secondSon != null)
             NarrowCollisionDetectionRecursive(node.secondSon, createConstraints, h);
+    }
+
+    public void NarrowCollisionDetectionRecursive(BVH_node node, bool createConstraints, double h, List<List<Correction>> corrections)
+    {
+        if (node.colliders.Length <= 1)
+            return;
+        if (node.firstSon == null && node.secondSon == null)
+        {
+            //node.aabb.DrawWireframe(Color.cyan);
+            /* string str = "";
+             foreach(PBDCollider c in node.colliders)
+                 str += " ," + c.name;
+             Debug.Log("check node " + str );*/
+            // Debug.Log(node.colliders.Length);
+            FullCollisionDetection(node.colliders, h, createConstraints, corrections);
+            return;
+        }
+        if (node.firstSon != null)
+            NarrowCollisionDetectionRecursive(node.firstSon, createConstraints, h, corrections);
+        if (node.secondSon != null)
+            NarrowCollisionDetectionRecursive(node.secondSon, createConstraints, h, corrections);
     }
 
     private void UpdateAABBS()
@@ -171,6 +232,37 @@ public class CollisionEngine
         //  Debug.Log(count + " collisions");
     }
 
+    public void FullCollisionDetection(PBDCollider[] colArr, double h, bool createConstraints, List<List<Correction>> corrections)
+    {
+        colCount = 0;
+        //    Debug.Log("----------");
+        for (int i = 0; i < colArr.Length; i++)
+        {
+            for (int j = i + 1; j < colArr.Length; j++)
+            {
+                //       Debug.Log("cheking " + colArr[i].particle.gameObject.name  + "  " + colArr[j].particle.gameObject.name );
+                //   if(colArr[i].GetColliderType() == ColliderType.planeY || colArr[j].GetColliderType() == ColliderType.planeY )
+                ;
+                CheckCollision(colArr[i], colArr[j], createConstraints, h, corrections);
+                if (colArr[i].GetColliderType() != PBDColliderType.planeY && colArr[j].GetColliderType() != PBDColliderType.planeY)
+                {
+                    //  Debug.DrawLine(colArr[i].particle.position.ToVector3(), colArr[j].particle.position.ToVector3(), Color.yellow,0.3f);
+                    count++;
+                }
+            }
+        }
+        for (int i = 0; i < excludedColliders.Length; i++)
+        {
+            for (int j = 0; j < colArr.Length; j++)
+            {
+                CheckCollision(excludedColliders[i], colArr[j], createConstraints, h, corrections);
+            }
+        }
+        //   if(colCount > 0)
+        //   Debug.Log("colCount " + colCount);
+        //  Debug.Log(count + " collisions");
+    }
+
     public void FullCollisionDetection(int[] colArr, double h, bool createConstraints)//REAL ONE
     {
         for (int i = 0; i < colArr.Length; i++)
@@ -202,6 +294,37 @@ public class CollisionEngine
 //        Debug.Log(count + " collisions");
     }
 
+    public void FullCollisionDetection(int[] colArr, double h, bool createConstraints, List<List<Correction>> corrections)//REAL ONE
+    {
+        for (int i = 0; i < colArr.Length; i++)
+        {
+            for (int j = i + 1; j < colArr.Length; j++)
+            {
+                int minInd = Mathf.Min(colArr[i], colArr[j]);
+                int maxInd = Mathf.Max(colArr[i], colArr[j]);
+
+                /*checkedCols[minInd,maxInd] = true;
+                continue;*/
+
+
+                if (checkedCols[minInd, maxInd])
+                    continue;
+
+                checkedCols[minInd, maxInd] = true;
+                PBDCollider iCol = allColliders[colArr[i]];
+                PBDCollider jCol = allColliders[colArr[j]];
+                //     Debug.Log("cheking " + iCol.particle.gameObject.name  + "  " + jCol.particle.gameObject.name );
+                if (iCol.aabb.CollidesWith(jCol.aabb))
+                    CheckCollision(iCol, jCol, createConstraints, h, corrections);
+
+                //  Debug.DrawLine(iCol.particle.position.ToVector3(), jCol.particle.position.ToVector3(), Color.yellow,0.3f);
+                count++;
+            }
+        }
+
+//        Debug.Log(count + " collisions");
+    }
+
     private void CheckCollisionWithPlane(bool createConstraints, double h)
     {
         for (int i = 0; i < excludedColliders.Length; i++)
@@ -209,6 +332,17 @@ public class CollisionEngine
             for (int j = 0; j < allColliders.Length; j++)
             {
                 CheckCollision(excludedColliders[i], allColliders[j], createConstraints, h);
+            }
+        }
+    }
+
+    private void CheckCollisionWithPlane(bool createConstraints, double h, List<List<Correction>> corrections)
+    {
+        for (int i = 0; i < excludedColliders.Length; i++)
+        {
+            for (int j = 0; j < allColliders.Length; j++)
+            {
+                CheckCollision(excludedColliders[i], allColliders[j], createConstraints, h, corrections);
             }
         }
     }
@@ -226,6 +360,19 @@ public class CollisionEngine
         }
     }
 
+    private void CheckCollision(PBDCollider a, PBDCollider b, bool createConstraints, double h, List<List<Correction>> corrections)
+    {
+        bool collided = a.CheckCollision(b,  col);
+        if (collided)
+        {
+            colCount++;
+            if (createConstraints)
+                CreateConstraints(h, col, corrections);
+//            Debug.Log("col between " + a.name + " " + b.name + " " + col.correction);
+            AddCollisionToList(col);
+        }
+    }
+
     public void CreateConstraints(double h, PBDCollision collision)
     {
         nonPenetrationConstraint.SetNewValue(collision);
@@ -238,6 +385,18 @@ public class CollisionEngine
         staticFrictionConstraint.SetNewValue(collision, nonPenetrationConstraint, collision.frictionCol);
         //StaticFrictionConstraint staticFrictionConstraint = new StaticFrictionConstraint(collision, nonPenetrationConstraint, collision.frictionCol);
         staticFrictionConstraint.Solve(h);
+    }
+
+    public void CreateConstraints(double h, PBDCollision collision, List<List<Correction>> corrections)
+    {
+        nonPenetrationConstraint.SetNewValue(collision);
+        nonPenetrationConstraint.GetContribution(h, corrections);
+
+        if (!collision.hasFriction)
+            return;
+
+        staticFrictionConstraint.SetNewValue(collision, nonPenetrationConstraint, collision.frictionCol);
+        staticFrictionConstraint.GetContribution(h, corrections);
     }
 
     public void SeparateContacts()//TEMPORARY, SHOULD BE PART OF CONSTRAINT SOLVE

@@ -5,6 +5,7 @@ using UnityEditor;
 
 public abstract class Particle : MonoBehaviour
 {
+    public int indexID = 0;
     public bool wasInCollision = false;
     public Vector3 startingVelocity = Vector3.zero;
     public DoubleVector3 position = new DoubleVector3(0, 0, 0);
@@ -29,6 +30,7 @@ public abstract class Particle : MonoBehaviour
 
     public abstract DoubleQuaternion GetOrientation();
     public abstract void ApplyCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset);
+    public abstract DoubleQuaternion GetCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset);
     public abstract void ApplyCorrectionPrevOrientation(DoubleVector3 correction, DoubleVector3 offset);
     public virtual DoubleQuaternion GetPrevOrientation()
     {

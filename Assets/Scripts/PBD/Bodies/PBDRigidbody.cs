@@ -108,24 +108,21 @@ public class PBDRigidbody : Particle
         DoubleVector3 prevPos = position + orientation * offset;
 
         correction = ProjectToSelfCoordinates(correction);
-
-
         DoubleVector3 torque = DoubleVector3.Cross(offset, correction);
-
-
-        DoubleVector3 test = torque;
         torque =  orientation * (inertiaTensorInverted * torque);
-
-
         orientation += sign * 0.5 * torque * orientation;
         orientation =   DoubleQuaternion.Normal(orientation);
-        /* DoubleQuaternion corr = (torque * 1.4).ToQuaternion();
-         orientation +=   corr * orientation;
-         orientation =   DoubleQuaternion.Normal(orientation);*/
-
 
         DoubleVector3 newPos = position + orientation * offset;
         // position += (prevPos - newPos);
+    }
+
+    public override DoubleQuaternion GetCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset)
+    {
+        correction = ProjectToSelfCoordinates(correction);
+        DoubleVector3 torque = DoubleVector3.Cross(offset, correction);
+        torque =  orientation * (inertiaTensorInverted * torque);
+        return sign * 0.5 * torque * orientation;
     }
 
     public override void ApplyRotation(DoubleVector3 p, double sign, DoubleVector3 r)//Used in restitution

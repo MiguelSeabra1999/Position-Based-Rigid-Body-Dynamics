@@ -93,6 +93,15 @@ public class DistancePointConstraint : PBDConstraint
             bodies[index].ApplyCorrectionOrientation(correction, sign, bodyOffset);
     }
 
+    protected override DoubleQuaternion GetOrientationCorrection(DoubleVector3 correction, double sign, int index)
+    {
+        if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
+        {
+            return bodies[index].GetCorrectionOrientation(correction, sign, bodyOffset);
+        }
+        return new DoubleQuaternion(0, 0, 0, 0);
+    }
+
     protected override DoubleVector3 GetBodyR(int index)
     {
         return bodyOffset;

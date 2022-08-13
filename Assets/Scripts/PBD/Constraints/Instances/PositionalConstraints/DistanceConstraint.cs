@@ -94,4 +94,16 @@ public class DistanceConstraint : PBDConstraint
             bodies[index].ApplyCorrectionOrientation(correction, sign, offset);
         }
     }
+
+    protected override DoubleQuaternion GetOrientationCorrection(DoubleVector3 correction, double sign, int index)
+    {
+        DoubleVector3 offset = firstBodyOffset;
+        if (index == 1)
+            offset = secondBodyOffset;
+        if (DoubleVector3.MagnitudeSqr(offset) > 0)
+        {
+            return bodies[index].GetCorrectionOrientation(correction, sign, offset);
+        }
+        return new DoubleQuaternion(0, 0, 0, 0);
+    }
 }

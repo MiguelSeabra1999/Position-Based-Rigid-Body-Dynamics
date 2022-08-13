@@ -14,6 +14,11 @@ public class PBDParticle : Particle
         return;
     }
 
+    public override DoubleQuaternion GetCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset)
+    {
+        return new DoubleQuaternion(0, 0, 0, 0);
+    }
+
     public override void ApplyCorrectionPrevOrientation(DoubleVector3 correction, DoubleVector3 offset)
     {
         return;

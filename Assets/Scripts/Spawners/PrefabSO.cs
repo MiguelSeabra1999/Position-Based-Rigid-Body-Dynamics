@@ -10,6 +10,7 @@ public class PrefabSO : ScriptableObject
     public GameObject pbdCapsule;
     public GameObject pbdSphere;
     public GameObject pbdScene;
+    public GameObject pbdSceneJacobi;
     public GameObject pbdWreckingBall;
     public GameObject havokCube;
     public GameObject havokCapsule;

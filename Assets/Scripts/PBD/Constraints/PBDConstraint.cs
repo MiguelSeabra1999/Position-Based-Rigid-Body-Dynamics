@@ -46,6 +46,49 @@ public abstract class PBDConstraint
         return -1 * error / denominator;
     }
 
+    public virtual void GetContribution(double deltaTime, List<List<Correction>> corrections)
+    {
+        double error = Evaluate();
+
+        if (error == 0)
+            return;
+
+        lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
+
+        if (LagrangeMultConstraint())
+            return;
+
+        for (int i = 0; i < bodies.Count; i++)
+        {
+            //Debug.DrawLine(bodies[i].position.ToVector3(), (bodies[i].position + correction).ToVector3(), Color.yellow);
+
+
+            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
+
+            if (bodies[i].inverseMass != 0)
+            {
+                DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
+                DoubleVector3 positional = GetSign(i) * correction;
+                DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
+
+                //  Debug.Log("Attempting to add " + positional + " to body " + bodies[i].indexID);
+                corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+            }
+
+
+            if (bodies[i].GetOrientation().IsNan())
+                Debug.Log("Nan found rotation" + bodies[i].gameObject);
+            if (bodies[i].position.IsNan())
+                Debug.Log("Nan found position" + bodies[i].gameObject);
+            //bodies[i].prevPosition += correction;
+        }
+
+
+        /*    double newError = Evaluate();
+             if(newError != 0)
+                 Debug.Log("error " + newError);*/
+    }
+
     public virtual void Solve(double deltaTime)
     {
         double error = Evaluate();
@@ -89,5 +132,10 @@ public abstract class PBDConstraint
     protected virtual void UpdateOrientation(DoubleVector3 correction, double sign, int index)
     {
         return;
+    }
+
+    protected virtual DoubleQuaternion GetOrientationCorrection(DoubleVector3 correction, double sign, int index)
+    {
+        return new DoubleQuaternion(0, 0, 0, 0);
     }
 }

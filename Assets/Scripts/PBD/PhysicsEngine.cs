@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PhysicsEngine : MonoBehaviour
+public  class PhysicsEngine : MonoBehaviour
 {
     public bool stepByStep = false;
     public bool optimizeCollisionDetection = true;
@@ -12,7 +12,7 @@ public class PhysicsEngine : MonoBehaviour
 
     public bool storeTotalEnergy;
     public AnimationCurve totalEnergyPlot = new AnimationCurve();
-    private bool instantSeperateContacts = false;
+    protected bool instantSeperateContacts = false;
     public static double gravForce = 9.8;
     public  Particle[] allBodies;
     public  PBDParticle[] allParticles;
@@ -30,12 +30,12 @@ public class PhysicsEngine : MonoBehaviour
     public CollisionEngine collisionEngine = new CollisionEngine();
     public event UnityAction physicsStepEnd;
     public event UnityAction physicsSubstepEnd;
-    /*private List<PBDCollision> collisions = new List<PBDCollision>();
-    private  PBDCollision  col;*/
+    /*protected List<PBDCollision> collisions = new List<PBDCollision>();
+    protected  PBDCollision  col;*/
     // public double accuracy = 0.00001;
 
 
-    void Start()
+    protected virtual void Start()
     {
         allBodies = GetComponentsInChildren<Particle>();
         allParticles = GetComponentsInChildren<PBDParticle>();
@@ -63,56 +63,42 @@ public class PhysicsEngine : MonoBehaviour
             c.Init(allBodies);
     }
 
-    private void Update()
+    protected void Update()
     {
         double h = Time.deltaTime / substeps;
-        //Get potential collision should be done here
+
         if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep)
             collisionEngine.BroadCollisionDetection();
         for (int substep = 0; substep < substeps; substep++)
         {
             PositionalUpdate(h);
-            // CheckCollisions();
-
             ConstraintSolve(h);
-            //RecalcVelocities(h);
-
-            if (instantSeperateContacts)
-                collisionEngine.SeparateContacts();
-
             VelocitySolve(h);//Collision Handling
 
-
             physicsSubstepEnd?.Invoke();
-
             collisionEngine.Clear();
-            //temporaryConstraints.Clear();
 
             for (int i = 0; i < allBodies.Length; i++)
                 allBodies[i].PBDphysicsUpdate();
-            // ClampVelocity(h);
         }
         UpdateActualPositions();
 
-
         for (int i = 0; i < allBodies.Length; i++)
             allBodies[i].PBDupdate();
-        /*    if (storeTotalEnergy)
-                StoreTotalEnergy();*/
+
         if (stepByStep)
             Pause();
         physicsStepEnd?.Invoke();
-        // Debug.Break();
     }
 
-    private void VelocitySolve(double h)
+    protected void VelocitySolve(double h)
     {
         collisionEngine.LoopCollisions(
             (c) => c.HandleCollision(h)
         );
     }
 
-    private void RecalcVelocities(double h)
+    protected void RecalcVelocities(double h)
     {
         for (int i = 0; i <  allParticles.Length; i++)
         {
@@ -126,7 +112,7 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    private void PositionalUpdate(double h)
+    protected void PositionalUpdate(double h)
     {
         for (int i = 0; i < allBodies.Length; i++)
         {
@@ -138,7 +124,7 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    private void ConstraintSolve(double h)
+    protected virtual void ConstraintSolve(double h)
     {
         for (int i = 0; i < temporaryConstraints.Count; i++)
         {
@@ -165,7 +151,7 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    private void UpdateActualPositions()
+    protected void UpdateActualPositions()
     {
         for (int i = 0; i < allParticles.Length; i++)
         {
@@ -179,7 +165,7 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    private void StoreColliders()
+    protected void StoreColliders()
     {
         List<PBDCollider> cols = new List<PBDCollider>();
 
@@ -227,7 +213,7 @@ public class PhysicsEngine : MonoBehaviour
         return hasHit;
     }
 
-    private void StoreTotalEnergy()
+    protected void StoreTotalEnergy()
     {
         double sum = 0;
         foreach (Particle p in allBodies)
