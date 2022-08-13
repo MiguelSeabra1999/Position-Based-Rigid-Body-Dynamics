@@ -264,7 +264,7 @@ public class PBDColliderBox : PBDCollider
         int axis = 0;
         if (IsParallelWithAxis(other, normal))
         {
-            Debug.Log("parallel" + normal);
+//            Debug.Log("parallel" + normal);
             other.HasParallelAxis(normal, ref axis);
             otherCollisionPoint = other.GetFurthestFaceAlongDirection(-normal,  axis);
             HasParallelAxis(normal, ref axis);
@@ -283,12 +283,14 @@ public class PBDColliderBox : PBDCollider
         DoubleVector3 offset = other.particle.position - particle.position;
         if (other.HasPerpendicularEdge(normal, ref axis))
         {
-            collisionPoint = other.GetFurthestEdgeAlongDirection(offset, axis);
-            Debug.Log("PERP");
+            collisionPoint = other.GetFurthestEdgeAlongDirection(normal, axis);
+
+
+            //    Debug.Log("PERP");
             return collisionPoint;
         }
         useFriction = false;
-        Debug.Log("point");
+        //  Debug.Log("point");
         return other.GetFurthestPointAlongDirection(normal);
 
         //   Debug.LogError("No colission point was found between " + gameObject.name + " and " + other.gameObject.name);
