@@ -17,6 +17,7 @@ public  class PhysicsEngine : MonoBehaviour
     public  Particle[] allBodies;
     public  PBDParticle[] allParticles;
     public  PBDRigidbody[] allRigidbodies;
+    private  PBDMonoBehaviour[] monoBehaviours;
 
     public int substeps = 1;
     public List<PBDConstraint> constraints = new List<PBDConstraint>();
@@ -40,6 +41,7 @@ public  class PhysicsEngine : MonoBehaviour
         allBodies = GetComponentsInChildren<Particle>();
         allParticles = GetComponentsInChildren<PBDParticle>();
         allRigidbodies = GetComponentsInChildren<PBDRigidbody>();
+        monoBehaviours = GetComponentsInChildren<PBDMonoBehaviour>();
         foreach (BallJointConstraint c in ballJointConstraint)
         {
             constraints.Add(c);
@@ -75,16 +77,31 @@ public  class PhysicsEngine : MonoBehaviour
             ConstraintSolve(h);
             VelocitySolve(h);//Collision Handling
 
-            physicsSubstepEnd?.Invoke();
-            collisionEngine.Clear();
 
-            for (int i = 0; i < allBodies.Length; i++)
-                allBodies[i].PBDphysicsUpdate();
+            InvokePhysicsUpdate(h);
+            collisionEngine.Clear();
         }
         UpdateActualPositions();
+        InvokeUpdate();
+    }
 
+    private void InvokePhysicsUpdate(double h)
+    {
+        for (int i = 0; i < allBodies.Length; i++)
+            allBodies[i].PBDphysicsUpdate();
+
+        for (int i = 0; i < monoBehaviours.Length; i++)
+            monoBehaviours[i].PBDphysicsUpdate(h);
+        physicsSubstepEnd?.Invoke();
+    }
+
+    private void InvokeUpdate()
+    {
         for (int i = 0; i < allBodies.Length; i++)
             allBodies[i].PBDupdate();
+
+        for (int i = 0; i < monoBehaviours.Length; i++)
+            monoBehaviours[i].PBDUpdate();
 
         if (stepByStep)
             Pause();

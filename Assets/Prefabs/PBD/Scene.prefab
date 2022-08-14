@@ -51,7 +51,6 @@ MonoBehaviour:
   stepByStep: 0
   optimizeCollisionDetection: 1
   performBroadPhaseOncePerSimStep: 0
-  minimumVelocity: 0
   storeTotalEnergy: 1
   totalEnergyPlot:
     serializedVersion: 2
@@ -82,7 +81,7 @@ MonoBehaviour:
   engine: {fileID: 0}
   cam: {fileID: 0}
   compliance: 0.00001
-  sensitivity: 1
+  sensitivity: 0.1
 --- !u!114 &3971845552805209109
 MonoBehaviour:
   m_ObjectHideFlags: 0

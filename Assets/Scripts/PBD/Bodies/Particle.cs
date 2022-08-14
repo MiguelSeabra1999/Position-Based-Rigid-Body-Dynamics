@@ -5,6 +5,7 @@ using UnityEditor;
 
 public abstract class Particle : MonoBehaviour
 {
+    public DoubleVector3 externalForce = new DoubleVector3(0);
     public int indexID = 0;
     public bool wasInCollision = false;
     public Vector3 startingVelocity = Vector3.zero;
@@ -143,6 +144,7 @@ public abstract class Particle : MonoBehaviour
     public virtual void UpdateVelocity(double h)
     {
         velocity += new DoubleVector3(0, -1, 0) * PhysicsEngine.gravForce * h * gravityScale;
+        velocity += externalForce * h;
     }
 
     public virtual void UpdatePosition(double h)

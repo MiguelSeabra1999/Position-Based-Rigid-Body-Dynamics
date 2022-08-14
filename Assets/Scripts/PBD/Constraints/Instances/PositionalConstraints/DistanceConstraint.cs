@@ -6,6 +6,8 @@ using UnityEngine;
 [Serializable]
 public class DistanceConstraint : PBDConstraint
 {
+    public bool worldSpace1 = false;
+    public bool worldSpace2 = false;
     public double goalDistance;
     public int firstBodyIndex;
     public int secondBodyIndex;
@@ -72,8 +74,14 @@ public class DistanceConstraint : PBDConstraint
 
     public override double Evaluate()
     {
-        DoubleVector3 distanceVec = (bodies[1].position + bodies[1].GetOrientation() * secondBodyOffset) -  (bodies[0].position + bodies[0].GetOrientation() * firstBodyOffset);
-        Debug.DrawLine((bodies[1].position + bodies[1].GetOrientation() * secondBodyOffset).ToVector3(), (bodies[0].position + bodies[0].GetOrientation() * firstBodyOffset).ToVector3());
+        DoubleVector3 realOffset1 = firstBodyOffset;
+        if (!worldSpace1)
+            realOffset1 = bodies[0].GetOrientation() * firstBodyOffset;
+        DoubleVector3 realOffset2 = secondBodyOffset;
+        if (!worldSpace2)
+            realOffset2 = bodies[1].GetOrientation() * secondBodyOffset;
+        DoubleVector3 distanceVec = (bodies[1].position + realOffset2) -  (bodies[0].position + realOffset1);
+        Debug.DrawLine((bodies[1].position + realOffset2).ToVector3(), (bodies[0].position + realOffset1).ToVector3());
         bodyDirection = DoubleVector3.Normal(distanceVec);
 
         double distance = DoubleVector3.Magnitude(distanceVec);
@@ -86,6 +94,10 @@ public class DistanceConstraint : PBDConstraint
 
     protected override void UpdateOrientation(DoubleVector3 correction, double sign, int index)
     {
+        if (index == 0 && worldSpace1)
+            return;
+        if (index == 1 && worldSpace2)
+            return;
         DoubleVector3 offset = firstBodyOffset;
         if (index == 1)
             offset = secondBodyOffset;
@@ -97,6 +109,10 @@ public class DistanceConstraint : PBDConstraint
 
     protected override DoubleQuaternion GetOrientationCorrection(DoubleVector3 correction, double sign, int index)
     {
+        if (index == 0 && worldSpace1)
+            return new DoubleQuaternion(0, 0, 0, 0);
+        if (index == 1 && worldSpace2)
+            return new DoubleQuaternion(0, 0, 0, 0);
         DoubleVector3 offset = firstBodyOffset;
         if (index == 1)
             offset = secondBodyOffset;
