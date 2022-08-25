@@ -7,6 +7,7 @@ using UnityEngine;
 public abstract class PBDCollider : MonoBehaviour
 {
     [HideInInspector] public Particle particle;
+    public bool exclude = false;
     public Vector3 pos = Vector3.zero;
     public bool isTrigger = false;
     public AABB aabb;

@@ -93,7 +93,7 @@ public class CollisionEngine
         int count = cols.Count;
         for (int i = 0; i < count; i++)
         {
-            if (cols[i].GetColliderType() == PBDColliderType.planeY)
+            if (cols[i].GetColliderType() == PBDColliderType.planeY || cols[i].exclude)
                 excluded.Add(cols[i]);
         }
         for (int i = 0; i < excluded.Count; i++)
