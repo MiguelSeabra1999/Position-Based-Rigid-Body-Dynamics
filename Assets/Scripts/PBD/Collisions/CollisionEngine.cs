@@ -25,6 +25,7 @@ public class CollisionEngine
     public int colCount = 0;
     bool[,] checkedCols;
 
+
     public BVH_node GetNewNode(int[] colliders)
     {
         if (nodes.Count <= nodeCount)
@@ -42,6 +43,16 @@ public class CollisionEngine
             nodes.Add(new BVH_node(this));
 
         nodes[nodeCount].SetNewValues(n);
+
+        nodeCount++;
+        return nodes[nodeCount - 1];
+    }
+
+    public BVH_node GetNewNode()
+    {
+        if (nodes.Count <= nodeCount)
+            nodes.Add(new BVH_node(this));
+
 
         nodeCount++;
         return nodes[nodeCount - 1];
@@ -105,6 +116,8 @@ public class CollisionEngine
         allColliders = cols.ToArray();
         checkedCols = new bool[allColliders.Length, allColliders.Length];
         excludedColliders = excluded.ToArray();
+
+        BVH_node.maxColliders = allColliders.Length;
     }
 
     public void BroadCollisionDetection()
@@ -160,7 +173,8 @@ public class CollisionEngine
                  str += " ," + c.name;
              Debug.Log("check node " + str );*/
             // Debug.Log(node.colliders.Length);
-            FullCollisionDetection(node.colliders, h, createConstraints);
+            FullCollisionDetection(node.colliders, node.nColliders, h, createConstraints);
+            FullCollisionDetection(node.colliders,  h, createConstraints);
             return;
         }
         if (node.firstSon != null)
@@ -171,7 +185,7 @@ public class CollisionEngine
 
     public void NarrowCollisionDetectionRecursive(BVH_node node, bool createConstraints, double h, List<List<Correction>> corrections)
     {
-        if (node.colliders.Length <= 1)
+        if (node.nColliders <= 1)
             return;
         if (node.firstSon == null && node.secondSon == null)
         {
@@ -265,9 +279,14 @@ public class CollisionEngine
 
     public void FullCollisionDetection(int[] colArr, double h, bool createConstraints)//REAL ONE
     {
-        for (int i = 0; i < colArr.Length; i++)
+        FullCollisionDetection(colArr, colArr.Length, h, createConstraints);
+    }
+
+    public void FullCollisionDetection(int[] colArr, int n, double h, bool createConstraints)//REAL ONE
+    {
+        for (int i = 0; i < n; i++)
         {
-            for (int j = i + 1; j < colArr.Length; j++)
+            for (int j = i + 1; j < n; j++)
             {
                 int minInd = Mathf.Min(colArr[i], colArr[j]);
                 int maxInd = Mathf.Max(colArr[i], colArr[j]);

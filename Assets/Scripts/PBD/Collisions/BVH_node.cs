@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class BVH_node
 {
+    public static int maxColliders = 1;
     public AABB aabb;
     public int[] colliders = null;
+    public int nColliders = 0;
     public BVH_node firstSon = null;
     public BVH_node secondSon = null;
     private CollisionEngine collisionEngine;
@@ -13,6 +15,7 @@ public class BVH_node
     public BVH_node(CollisionEngine collisionEngine)
     {
         this.collisionEngine = collisionEngine;
+        colliders = new int[maxColliders];
     }
 
     /*   public BVH_node(CollisionEngine collisionEngine, int[] colliders)
@@ -36,9 +39,16 @@ public class BVH_node
         CalcAABB();
     }
 
+    public void AddCollider(int n)
+    {
+        colliders[nColliders] = n;
+        nColliders++;
+    }
+
     public void SetNewValues(int n)
     {
-        this.colliders = new int[n];
+        // this.colliders = new int[n];
+        nColliders = n;
         for (int i = 0; i < n; i++)
             colliders[i] = i;
 
@@ -62,15 +72,15 @@ public class BVH_node
         bool foundDiv = false;
         for (int i = 0; i < 3; i++)
         {
-            (int[] a, int[] b)colliderLists = SeparateColliders(index, halfPoint);
+            (BVH_node a, BVH_node b)nodes = SeparateColliders(index, halfPoint);
 
-            if (colliderLists.a.Length > 0)
-                firstSon = collisionEngine.GetNewNode(colliderLists.a);
+            if (nodes.a != null)
+                firstSon = nodes.a;
             // firstSon = new BVH_node(collisionEngine, colliderLists.a);
-            if (colliderLists.b.Length > 0)
-                secondSon = collisionEngine.GetNewNode(colliderLists.b);
+            if (nodes.b != null)
+                secondSon = nodes.b;
             //secondSon = new BVH_node(collisionEngine, colliderLists.b);
-            if (firstSon.aabb != aabb && secondSon.aabb != aabb)
+            if ((firstSon != null && secondSon != null) && (firstSon.aabb != aabb && secondSon.aabb != aabb))
             {
                 foundDiv = true;
                 break;
@@ -90,31 +100,39 @@ public class BVH_node
         }
     }
 
-    private (int[], int[]) SeparateColliders(int index, double halfPoint)
+    private (BVH_node, BVH_node) SeparateColliders(int index, double halfPoint)
     {
-        List<int> collidersA = new List<int>();
-        List<int> collidersB = new List<int>();
-        foreach (int col in colliders)
+        BVH_node firstSon = null, secondSon = null;
+        for (int i = 0; i < nColliders; i++)
         {
             /*  bool isPlane = col.GetColliderType() == ColliderType.planeY;
               if(isPlane)
                   continue;*/
+            int col = colliders[i];
 
             if (collisionEngine.allColliders[col].aabb.pos[index] < halfPoint)
             {
-                collidersA.Add(col);
+                if (firstSon == null)
+                    firstSon = collisionEngine.GetNewNode();
+                firstSon.AddCollider(col);
             }
             else if (collisionEngine.allColliders[col].aabb.neg[index] > halfPoint)
             {
-                collidersB.Add(col);
+                if (secondSon == null)
+                    secondSon = collisionEngine.GetNewNode();
+                secondSon.AddCollider(col);
             }
             else //somewhere in the middle
             {
-                collidersA.Add(col);
-                collidersB.Add(col);
+                if (firstSon == null)
+                    firstSon = collisionEngine.GetNewNode();
+                firstSon.AddCollider(col);
+                if (secondSon == null)
+                    secondSon = collisionEngine.GetNewNode();
+                secondSon.AddCollider(col);
             }
         }
-        return (collidersA.ToArray(), collidersB.ToArray());
+        return (firstSon, secondSon);
     }
 
     public void CalcAABB()
