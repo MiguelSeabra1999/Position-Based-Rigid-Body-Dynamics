@@ -35,7 +35,7 @@ public class BVH_node
     public void SetNewValues(int[] colliders)
     {
         this.colliders = colliders;
-
+        nColliders = colliders.Length - 1;
         CalcAABB();
     }
 

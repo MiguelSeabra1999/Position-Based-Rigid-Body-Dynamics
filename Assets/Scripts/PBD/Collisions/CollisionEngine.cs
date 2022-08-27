@@ -55,6 +55,7 @@ public class CollisionEngine
 
 
         nodeCount++;
+        nodes[nodeCount - 1].nColliders = 0;
         return nodes[nodeCount - 1];
     }
 
@@ -82,6 +83,8 @@ public class CollisionEngine
 
     public void Clear()
     {
+        ClearNodes();
+        PBDFrictionCollision.ResetList();
         //collisions.Clear();
         colLen = 0;
         for (int i = 0; i < allColliders.Length; i++)

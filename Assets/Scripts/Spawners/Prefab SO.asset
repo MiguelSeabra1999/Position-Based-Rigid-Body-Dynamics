@@ -23,6 +23,8 @@ MonoBehaviour:
     type: 3}
   pbdWreckingBall: {fileID: 5373107075581347794, guid: c390b45f13a172544970e1a011ef8ca4,
     type: 3}
+  pbdParticle: {fileID: 5373107075581347794, guid: aa19affbf59bdd5409f70a9bcda079ad,
+    type: 3}
   havokCube: {fileID: 1877213096559564713, guid: 03f99ac74d7e5f14a93952ffe722cfcb,
     type: 3}
   havokCapsule: {fileID: 1877213096559564713, guid: 098d82e5392e6d146baf2d02bbd438d9,

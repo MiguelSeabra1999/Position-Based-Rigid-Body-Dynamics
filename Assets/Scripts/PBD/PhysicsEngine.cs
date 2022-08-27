@@ -27,6 +27,7 @@ public  class PhysicsEngine : MonoBehaviour
     public List<BallJointConstraint> ballJointConstraint = new List<BallJointConstraint>();
     public List<TwistConstraint> twistConstraint = new List<TwistConstraint>();
     public List<HingeConstraint> hingeConstraint = new List<HingeConstraint>();
+    public List<VolumeConstraint> volumeConstraint = new List<VolumeConstraint>();
 
     public CollisionEngine collisionEngine = new CollisionEngine();
     public event UnityAction physicsStepEnd;
@@ -55,6 +56,10 @@ public  class PhysicsEngine : MonoBehaviour
             constraints.Add(c);
         }
         foreach (DistanceConstraint c in distanceConstraints)
+        {
+            constraints.Add(c);
+        }
+        foreach (VolumeConstraint c in volumeConstraint)
         {
             constraints.Add(c);
         }

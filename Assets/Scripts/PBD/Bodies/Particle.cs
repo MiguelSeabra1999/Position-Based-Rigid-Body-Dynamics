@@ -75,7 +75,7 @@ public abstract class Particle : MonoBehaviour
 
     public virtual void PBDupdate()
     {
-        DrawLine();
+        // DrawLine();
     }
 
     public virtual void PBDphysicsUpdate()

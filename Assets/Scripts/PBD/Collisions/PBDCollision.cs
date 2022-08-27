@@ -110,7 +110,7 @@ public  class PBDCollision
 
     private void InitCollision()
     {
-        frictionCol = new PBDFrictionCollision();
+        frictionCol = PBDFrictionCollision.GetNewFrictionCollision();
 
         hasFriction = ((a.staticFrictionCoefficient != 0 && b.staticFrictionCoefficient != 0) || (a.dynamicFrictionCoefficient != 0  && b.dynamicFrictionCoefficient != 0));
         a.wasInCollision = true;

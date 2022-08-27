@@ -11,8 +11,8 @@ public class DistanceConstraint : PBDConstraint
     public double goalDistance;
     public int firstBodyIndex;
     public int secondBodyIndex;
-    public PBDRigidbody body = null;
-    public PBDRigidbody otherBody = null;
+    public Particle body = null;
+    public Particle otherBody = null;
 
 
     public Vector3 firstBodyOffsetFloat;
