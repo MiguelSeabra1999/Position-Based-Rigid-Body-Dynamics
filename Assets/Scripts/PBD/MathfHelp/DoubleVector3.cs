@@ -310,6 +310,11 @@ public readonly struct DoubleVector3
         return double.IsNaN(x) || double.IsNaN(y) || double.IsNaN(z);
     }
 
+    public bool IsInfinite()
+    {
+        return !(double.IsFinite(x) && double.IsFinite(y) && double.IsFinite(z));
+    }
+
     public DoubleVector3 FindPerpendicularVector()
     {
         double _x = 0, _y = 0, _z = 0;

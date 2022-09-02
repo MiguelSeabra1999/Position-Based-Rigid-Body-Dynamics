@@ -132,12 +132,16 @@ public class BVH_node
                 secondSon.AddCollider(col);
             }
         }
+        if (firstSon != null)
+            firstSon.CalcAABB();
+        if (secondSon != null)
+            secondSon.CalcAABB();
         return (firstSon, secondSon);
     }
 
     public void CalcAABB()
     {
-        aabb = AABB.Join(collisionEngine.allColliders, colliders);
+        aabb = AABB.Join(collisionEngine.allColliders, colliders, nColliders);
     }
 
     public bool IsValid()

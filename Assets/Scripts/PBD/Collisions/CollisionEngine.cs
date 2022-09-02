@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class CollisionEngine
 {
+    public bool selfCollisions = true;
     public double k = 2;
     public PBDCollider[] allColliders;
     public PBDCollider[] excludedColliders;
@@ -135,7 +136,8 @@ public class CollisionEngine
     public void BroadCollisionDetectionRecursive(BVH_node node, int depth)
     {
         node.Branch();
-
+        /*   node.aabb.DrawWireframe(Color.red);
+           Debug.Log("depth: " + depth);*/
         if (node.firstSon != null && node.firstSon.IsValid())
             BroadCollisionDetectionRecursive(node.firstSon, depth + 1);
         if (node.secondSon != null && node.secondSon.IsValid())
@@ -149,7 +151,8 @@ public class CollisionEngine
         count = 0;
         colCount = 0;
         //  Debug.Log("----------");
-        NarrowCollisionDetectionRecursive(root, createConstraints, h);
+        if (selfCollisions)
+            NarrowCollisionDetectionRecursive(root, createConstraints, h);
         CheckCollisionWithPlane(createConstraints, h);
     }
 
@@ -160,7 +163,8 @@ public class CollisionEngine
         count = 0;
         colCount = 0;
         //  Debug.Log("----------");
-        NarrowCollisionDetectionRecursive(root, createConstraints, h, corrections);
+        if (selfCollisions)
+            NarrowCollisionDetectionRecursive(root, createConstraints, h, corrections);
         CheckCollisionWithPlane(createConstraints, h, corrections);
     }
 
@@ -170,14 +174,14 @@ public class CollisionEngine
             return;
         if (node.firstSon == null && node.secondSon == null)
         {
-            //node.aabb.DrawWireframe(Color.cyan);
-            /* string str = "";
-             foreach(PBDCollider c in node.colliders)
-                 str += " ," + c.name;
-             Debug.Log("check node " + str );*/
-            // Debug.Log(node.colliders.Length);
+            // node.aabb.DrawWireframe(Color.cyan);
+            /*  string str = "";
+              for (int c = 0; c < node.nColliders; c++)
+                  str += " ," + allColliders[node.colliders[c]].name;
+              Debug.Log("check node " + str);*/
+            //  Debug.Log(node.colliders.Length);
             FullCollisionDetection(node.colliders, node.nColliders, h, createConstraints);
-            FullCollisionDetection(node.colliders,  h, createConstraints);
+            //  FullCollisionDetection(node.colliders,  h, createConstraints);
             return;
         }
         if (node.firstSon != null)
@@ -198,7 +202,8 @@ public class CollisionEngine
                  str += " ," + c.name;
              Debug.Log("check node " + str );*/
             // Debug.Log(node.colliders.Length);
-            FullCollisionDetection(node.colliders, h, createConstraints, corrections);
+            //    FullCollisionDetection(node.colliders, h, createConstraints, corrections);
+            FullCollisionDetection(node.colliders, node.nColliders, h, createConstraints);
             return;
         }
         if (node.firstSon != null)
@@ -215,6 +220,7 @@ public class CollisionEngine
             double expansion = k * Time.deltaTime * DoubleVector3.Magnitude(allColliders[i].particle.velocity);
             if (k > 0)
                 allColliders[i].aabb.Expand(expansion);
+            // allColliders[i].aabb.DrawWireframe(Color.gray);
         }
     }
 
@@ -287,15 +293,13 @@ public class CollisionEngine
 
     public void FullCollisionDetection(int[] colArr, int n, double h, bool createConstraints)//REAL ONE
     {
+        // Debug.Log(n);
         for (int i = 0; i < n; i++)
         {
             for (int j = i + 1; j < n; j++)
             {
                 int minInd = Mathf.Min(colArr[i], colArr[j]);
                 int maxInd = Mathf.Max(colArr[i], colArr[j]);
-
-                /*checkedCols[minInd,maxInd] = true;
-                continue;*/
 
 
                 if (checkedCols[minInd, maxInd])

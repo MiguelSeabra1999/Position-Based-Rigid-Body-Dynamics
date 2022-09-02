@@ -10,7 +10,9 @@ public class VolumeConstraint : PBDConstraint
     public Particle body2 = null;
     public Particle body3 = null;
     public double goalVolume = 0;
+    private DoubleVector3[] gradients = new DoubleVector3[4];
     private const double oneSixth = 1.0 / 6.0;
+    // private bool invert = false;
     public override void Init(Particle[] allParticles)
     {
         bodies.Add(body0);
@@ -23,19 +25,38 @@ public class VolumeConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
+        return DoubleVector3.Normal(gradients[bodyIndex]);
+    }
+
+    protected  DoubleVector3 CalcGradient(int bodyIndex)
+    {
+        DoubleVector3 result;
         switch (bodyIndex)
         {
             case 0:
-                return DoubleVector3.Normal(DoubleVector3.Cross((bodies[3].position - bodies[1].position), (bodies[2].position - bodies[1].position)));
+                result = DoubleVector3.Cross((bodies[3].position - bodies[1].position), (bodies[2].position - bodies[1].position));
+                break;
             case 1:
-                return DoubleVector3.Normal(DoubleVector3.Cross((bodies[2].position - bodies[0].position), (bodies[3].position - bodies[0].position)));
+                result = DoubleVector3.Cross((bodies[2].position - bodies[0].position), (bodies[3].position - bodies[0].position));
+                break;
             case 2:
-                return DoubleVector3.Normal(DoubleVector3.Cross((bodies[3].position - bodies[0].position), (bodies[1].position - bodies[0].position)));
+                result = DoubleVector3.Cross((bodies[3].position - bodies[0].position), (bodies[1].position - bodies[0].position));
+                break;
             case 3:
-                return DoubleVector3.Normal(DoubleVector3.Cross((bodies[1].position - bodies[0].position), (bodies[2].position - bodies[0].position)));
+                result = DoubleVector3.Cross((bodies[1].position - bodies[0].position), (bodies[2].position - bodies[0].position));
+                break;
             default:
-                return new DoubleVector3(0);
+                result =  new DoubleVector3(0);
+                break;
         }
+
+
+        if (result.IsNan())
+        {
+            result =  new DoubleVector3(0);
+        }
+
+        return result;
     }
 
     protected override double GetSign(int i)
@@ -45,31 +66,37 @@ public class VolumeConstraint : PBDConstraint
 
     protected override double GetGradientMagnitude(int bodyIndex)
     {
-        return 1;
-        /* switch (bodyIndex)
-         {
-             case 0:
-                 return DoubleVector3.Magnitude(DoubleVector3.Cross((bodies[3].position - bodies[1].position), (bodies[2].position - bodies[1].position)));
-             case 1:
-                 return DoubleVector3.Magnitude(DoubleVector3.Cross((bodies[2].position - bodies[0].position), (bodies[3].position - bodies[0].position)));
-             case 2:
-                 return DoubleVector3.Magnitude(DoubleVector3.Cross((bodies[3].position - bodies[0].position), (bodies[1].position - bodies[0].position)));
-             case 3:
-                 return DoubleVector3.Magnitude(DoubleVector3.Cross((bodies[1].position - bodies[0].position), (bodies[2].position - bodies[0].position)));
-             default:
-                 return 0;
-         }*/
+        return 0.25;
+        //  return DoubleVector3.Magnitude(gradients[bodyIndex]);
     }
 
     public override double Evaluate()
     {
-        return 6 * (CalcVolume() - goalVolume);
+        //invert = false;
+        double currentVolume = CalcVolume();
+        double error =  6 * (currentVolume - goalVolume);
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            gradients[i] = CalcGradient(i);
+        }
+
+//        Debug.Log(currentVolume);
+        return error;
     }
 
     private double CalcVolume()
     {
         DoubleVector3 cross = DoubleVector3.Cross((bodies[1].position - bodies[0].position), (bodies[2].position - bodies[0].position));
+
+
+        if (DoubleVector3.Magnitude(cross) == 0)
+            Debug.Log("zero mag in eval");
+        if (cross.IsNan())
+            Debug.Log("Nan gradient in eval");
         double dot = DoubleVector3.Dot(cross, (bodies[3].position - bodies[0].position));
+
 
         return oneSixth * dot;
     }

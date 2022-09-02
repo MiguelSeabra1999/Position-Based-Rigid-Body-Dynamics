@@ -6,6 +6,9 @@ using UnityEngine;
 [Serializable]
 public class DistanceConstraint : PBDConstraint
 {
+    public double minDistanceThreshold = 0;
+    public double maxDistanceThreshold = 0;
+    private double baseCompliance = 0;
     public bool worldSpace1 = false;
     public bool worldSpace2 = false;
     public double goalDistance;
@@ -33,6 +36,7 @@ public class DistanceConstraint : PBDConstraint
 */
     public override void Init(Particle[] allParticles)
     {
+        baseCompliance = compliance;
         if (body == null || otherBody == null)
         {
             bodies.Add(allParticles[firstBodyIndex]);
@@ -89,6 +93,12 @@ public class DistanceConstraint : PBDConstraint
 
         if (Math.Abs(error) < accuracy)
             return 0;
+
+        if ((distance > maxDistanceThreshold && maxDistanceThreshold != 0) || (distance < minDistanceThreshold && minDistanceThreshold != 0))
+            compliance = 0;
+        else
+            compliance = baseCompliance;
+
         return error;
     }
 

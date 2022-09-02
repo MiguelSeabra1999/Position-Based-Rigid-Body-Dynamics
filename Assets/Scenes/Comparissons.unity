@@ -5108,7 +5108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &500173767
 Transform:
   m_ObjectHideFlags: 0
@@ -8640,7 +8640,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &770688078
 Transform:
   m_ObjectHideFlags: 0
@@ -13679,7 +13679,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1239428676
 Transform:
   m_ObjectHideFlags: 0
@@ -13748,6 +13748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 759de241d2e75a14da15c33ec06509c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selfCollisions: 1
   stepByStep: 0
   optimizeCollisionDetection: 1
   performBroadPhaseOncePerSimStep: 1
@@ -13765,6 +13766,8 @@ MonoBehaviour:
   distanceConstraints:
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13776,6 +13779,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13787,6 +13792,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13798,6 +13805,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13809,6 +13818,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13820,6 +13831,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13831,6 +13844,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13842,6 +13857,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13853,6 +13870,8 @@ MonoBehaviour:
     secondBodyOffsetFloat: {x: 0, y: 0.5, z: 0}
   - compliance: 0
     lagrangeMult: 0
+    minDistanceThreshold: 0
+    maxDistanceThreshold: 0
     worldSpace1: 0
     worldSpace2: 0
     goalDistance: 0
@@ -13865,6 +13884,7 @@ MonoBehaviour:
   ballJointConstraint: []
   twistConstraint: []
   hingeConstraint: []
+  volumeConstraint: []
 --- !u!114 &1239428678
 MonoBehaviour:
   m_ObjectHideFlags: 0

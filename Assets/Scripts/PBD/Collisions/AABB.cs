@@ -46,11 +46,11 @@ public struct AABB
         return result;
     }
 
-    public static AABB Join(PBDCollider[] collisionList, int[] indexes)
+    public static AABB Join(PBDCollider[] collisionList, int[] indexes, int n)
     {
         AABB result = collisionList[indexes[0]].aabb;
 
-        for (int i = 0; i < indexes.Length; i++)
+        for (int i = 0; i < n; i++)
         {
             result = AABB.Join(result, collisionList[indexes[i]].aabb);
         }

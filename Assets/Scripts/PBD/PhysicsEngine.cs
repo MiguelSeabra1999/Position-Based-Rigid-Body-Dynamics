@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 public  class PhysicsEngine : MonoBehaviour
 {
+    public bool selfCollisions = true;
     public bool stepByStep = false;
     public bool optimizeCollisionDetection = true;
     public bool performBroadPhaseOncePerSimStep = false;
@@ -70,11 +71,11 @@ public  class PhysicsEngine : MonoBehaviour
             c.Init(allBodies);
     }
 
-    protected void Update()
+    protected virtual void Update()
     {
         double h = Time.deltaTime / substeps;
 
-        if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep)
+        if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep && selfCollisions)
             collisionEngine.BroadCollisionDetection();
         for (int substep = 0; substep < substeps; substep++)
         {
@@ -189,6 +190,7 @@ public  class PhysicsEngine : MonoBehaviour
 
     protected void StoreColliders()
     {
+        collisionEngine.selfCollisions = selfCollisions;
         List<PBDCollider> cols = new List<PBDCollider>();
 
         for (int i = 0; i < allParticles.Length; i++)

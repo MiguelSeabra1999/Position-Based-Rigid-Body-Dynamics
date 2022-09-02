@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SpawnerSoftBody : MonoBehaviour
 {
+    public bool drawParticleMeshes = true;
     public PrefabSO prefabSO;
     public double compliance = 0;
     public double friction = 0.2;
@@ -308,6 +309,11 @@ public class SpawnerSoftBody : MonoBehaviour
         p.staticFrictionCoefficient = friction;
         p.dynamicFrictionCoefficient = friction;
         obj.name = "" + id++;
+
+        if (!drawParticleMeshes)
+        {
+            obj.GetComponent<MeshRenderer>().enabled = false;
+        }
         return p;
     }
 

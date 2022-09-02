@@ -39,9 +39,12 @@ public abstract class PBDConstraint
         {
             double gradientMag = GetGradientMagnitude(i);
             double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
-            denominator += wi * gradientMag * gradientMag;
+            denominator += wi;
         }
         denominator += compliance / (deltaTime * deltaTime);
+
+        if (denominator == 0)
+            Debug.Log("Nan lagrange Multiplier");
 
         return -1 * error / denominator;
     }
@@ -80,6 +83,8 @@ public abstract class PBDConstraint
                 Debug.Log("Nan found rotation" + bodies[i].gameObject);
             if (bodies[i].position.IsNan())
                 Debug.Log("Nan found position" + bodies[i].gameObject);
+            if (bodies[i].position.IsInfinite())
+                Debug.Log("Infinite found position" + bodies[i].gameObject);
             //bodies[i].prevPosition += correction;
         }
 
@@ -98,6 +103,7 @@ public abstract class PBDConstraint
 
         lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
 
+
         if (LagrangeMultConstraint())
             return;
 
@@ -110,9 +116,11 @@ public abstract class PBDConstraint
 
             if (bodies[i].inverseMass != 0)
             {
-                DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
+                DoubleVector3 correction = GetGradient(i) *  GetGradientMagnitude(i) *   lagrangeMult *  (1 / bodies[i].mass);
                 bodies[i].position += GetSign(i) * correction;
                 UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
+
+                //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
             }
 
 
@@ -120,13 +128,18 @@ public abstract class PBDConstraint
                 Debug.Log("Nan found rotation" + bodies[i].gameObject);
             if (bodies[i].position.IsNan())
                 Debug.Log("Nan found position" + bodies[i].gameObject);
+            if (bodies[i].position.IsInfinite())
+            {
+                Debug.Log("Infinite found position" + bodies[i].gameObject);
+                Debug.Break();
+            }
             //bodies[i].prevPosition += correction;
         }
 
 
-        /*    double newError = Evaluate();
-             if(newError != 0)
-                 Debug.Log("error " + newError);*/
+        /*  double newError = Evaluate();
+          if (newError != 0)
+              Debug.Log("error " + newError);*/
     }
 
     protected virtual void UpdateOrientation(DoubleVector3 correction, double sign, int index)

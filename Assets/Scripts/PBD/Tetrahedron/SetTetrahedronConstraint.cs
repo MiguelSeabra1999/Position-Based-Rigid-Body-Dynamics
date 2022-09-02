@@ -38,6 +38,8 @@ public class SetTetrahedronConstraint : MonoBehaviour
         c.body = p[i];
         c.otherBody = p[j];
         c.goalDistance = (p[i].gameObject.transform.position - p[j].gameObject.transform.position).magnitude;
+        c.minDistanceThreshold = c.goalDistance * 0.2f;
+        c.maxDistanceThreshold = c.goalDistance * 2f;
         engine.distanceConstraints.Add(c);
     }
 
