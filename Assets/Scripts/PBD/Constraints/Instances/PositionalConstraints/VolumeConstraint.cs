@@ -12,6 +12,8 @@ public class VolumeConstraint : PBDConstraint
     public double goalVolume = 0;
     private DoubleVector3[] gradients = new DoubleVector3[4];
     private const double oneSixth = 1.0 / 6.0;
+
+
     // private bool invert = false;
     public override void Init(Particle[] allParticles)
     {
@@ -25,7 +27,7 @@ public class VolumeConstraint : PBDConstraint
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
     {
-        return DoubleVector3.Normal(gradients[bodyIndex]);
+        return gradients[bodyIndex];
     }
 
     protected  DoubleVector3 CalcGradient(int bodyIndex)
@@ -66,8 +68,9 @@ public class VolumeConstraint : PBDConstraint
 
     protected override double GetGradientMagnitude(int bodyIndex)
     {
-        return 0.25;
-        //  return DoubleVector3.Magnitude(gradients[bodyIndex]);
+        return 0.5;
+        //   Debug.Log("mag " + DoubleVector3.Magnitude(gradients[bodyIndex]));
+        //return DoubleVector3.Magnitude(gradients[bodyIndex]);
     }
 
     public override double Evaluate()
@@ -79,10 +82,10 @@ public class VolumeConstraint : PBDConstraint
 
         for (int i = 0; i < 4; i++)
         {
-            gradients[i] = CalcGradient(i);
+            gradients[i] = DoubleVector3.Normal(CalcGradient(i));
         }
 
-//        Debug.Log(currentVolume);
+        //Debug.Log(currentVolume);
         return error;
     }
 

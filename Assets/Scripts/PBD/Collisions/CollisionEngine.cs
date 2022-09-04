@@ -25,6 +25,7 @@ public class CollisionEngine
     public int count = 0;
     public int colCount = 0;
     bool[,] checkedCols;
+    public List<BVH_node> leafs = new List<BVH_node>();
 
 
     public BVH_node GetNewNode(int[] colliders)
@@ -130,7 +131,9 @@ public class CollisionEngine
             return;
         UpdateAABBS();
         root = GetNewNode(allColliders.Length);
+        leafs.Clear();
         BroadCollisionDetectionRecursive(root, 0);
+        // BroadCollisionDetectionIterative(root);
     }
 
     public void BroadCollisionDetectionRecursive(BVH_node node, int depth)
@@ -142,6 +145,11 @@ public class CollisionEngine
             BroadCollisionDetectionRecursive(node.firstSon, depth + 1);
         if (node.secondSon != null && node.secondSon.IsValid())
             BroadCollisionDetectionRecursive(node.secondSon, depth + 1);
+
+        if (node.IsLeaf())
+        {
+            leafs.Add(node);
+        }
     }
 
     public void NarrowCollisionDetection(bool createConstraints, double h)
@@ -152,7 +160,9 @@ public class CollisionEngine
         colCount = 0;
         //  Debug.Log("----------");
         if (selfCollisions)
-            NarrowCollisionDetectionRecursive(root, createConstraints, h);
+            //    NarrowCollisionDetectionRecursive(root, createConstraints, h);
+            NarrowCollisionDetectionIterative(root, createConstraints, h);
+
         CheckCollisionWithPlane(createConstraints, h);
     }
 
@@ -164,7 +174,8 @@ public class CollisionEngine
         colCount = 0;
         //  Debug.Log("----------");
         if (selfCollisions)
-            NarrowCollisionDetectionRecursive(root, createConstraints, h, corrections);
+            //NarrowCollisionDetectionRecursive(root, createConstraints, h, corrections);
+            NarrowCollisionDetectionIterative(root, createConstraints, h);
         CheckCollisionWithPlane(createConstraints, h, corrections);
     }
 
@@ -188,6 +199,14 @@ public class CollisionEngine
             NarrowCollisionDetectionRecursive(node.firstSon, createConstraints, h);
         if (node.secondSon != null)
             NarrowCollisionDetectionRecursive(node.secondSon, createConstraints, h);
+    }
+
+    public void NarrowCollisionDetectionIterative(BVH_node node, bool createConstraints, double h)
+    {
+        for (int i = 0; i < leafs.Count; i++)
+        {
+            FullCollisionDetection(leafs[i].colliders, leafs[i].nColliders, h, createConstraints);
+        }
     }
 
     public void NarrowCollisionDetectionRecursive(BVH_node node, bool createConstraints, double h, List<List<Correction>> corrections)

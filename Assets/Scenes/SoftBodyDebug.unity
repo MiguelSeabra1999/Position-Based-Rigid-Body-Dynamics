@@ -230,7 +230,7 @@ MonoBehaviour:
   allBodies: []
   allParticles: []
   allRigidbodies: []
-  substeps: 100
+  substeps: 1
   distanceConstraints: []
   ballJointConstraint: []
   twistConstraint: []

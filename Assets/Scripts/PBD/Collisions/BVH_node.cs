@@ -42,14 +42,21 @@ public class BVH_node
     public void AddCollider(int n)
     {
         colliders[nColliders] = n;
+        if (nColliders == 0)
+            aabb = collisionEngine.allColliders[colliders[0]].aabb;
+        else
+        {
+            AABB otherAABB = collisionEngine.allColliders[colliders[nColliders]].aabb;
+            aabb = AABB.Join(aabb, otherAABB);
+        }
         nColliders++;
     }
 
     public void SetNewValues(int n)
     {
-        // this.colliders = new int[n];
         nColliders = n;
         for (int i = 0; i < n; i++)
+            // AddCollider(i);
             colliders[i] = i;
 
         CalcAABB();
@@ -132,16 +139,21 @@ public class BVH_node
                 secondSon.AddCollider(col);
             }
         }
-        if (firstSon != null)
-            firstSon.CalcAABB();
-        if (secondSon != null)
-            secondSon.CalcAABB();
+        /* if (firstSon != null)
+             firstSon.CalcAABB();
+         if (secondSon != null)
+             secondSon.CalcAABB();*/
         return (firstSon, secondSon);
     }
 
     public void CalcAABB()
     {
         aabb = AABB.Join(collisionEngine.allColliders, colliders, nColliders);
+    }
+
+    public bool IsLeaf()
+    {
+        return firstSon == null &&  secondSon == null;
     }
 
     public bool IsValid()
