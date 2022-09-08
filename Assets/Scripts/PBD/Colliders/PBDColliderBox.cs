@@ -9,6 +9,8 @@ public class PBDColliderBox : PBDCollider
     [HideInInspector] public double diagonal;
     private Color color;
     private DoubleVector3[] points = new DoubleVector3[8];
+    private static double[] separatingDistances = new double[15];//used for box box intersection
+    private static DoubleVector3[] separatingAxes = new DoubleVector3[15];//used for box box intersection
     void OnDrawGizmos()
     {
         Gizmos.color = color;
@@ -734,5 +736,65 @@ public class PBDColliderBox : PBDCollider
 
             //   Debug.Log("result" + particle.GetOrientation().ToEuler() + " newDot = " + DoubleVector3.Dot(particle.up, axis));
         }
+    }
+
+    public static bool CheckCollisionBoxBox(PBDColliderBox self, PBDColliderBox other,  PBDCollision collision)
+    {
+        double dist = DoubleVector3.Magnitude(self.particle.position - other.particle.position);
+        if (dist > self.diagonal + other.diagonal)
+            return false;
+
+        double epsilon = 0.0000001;
+        Matrix3x3 R = Matrix3x3.Identity();
+        Matrix3x3 AbsR  = Matrix3x3.Identity();
+
+        DoubleVector3[] selfAxes = self.particle.GetAxes();
+        DoubleVector3[] otherAxes = other.particle.GetAxes();
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+            {
+                R[i * 3 + j] =  DoubleVector3.Dot(selfAxes[i], otherAxes[j]);
+                AbsR[i * 3 + j] =  Math.Abs(R[i * 3 + j]) + epsilon;
+            }
+
+        DoubleVector3 translation = other.particle.position - self.particle.position;
+        double magnitude = DoubleVector3.Magnitude(translation);
+
+        for (int i = 0; i < 15; i++)
+        {
+            PBDColliderBox.separatingDistances[i] = magnitude;
+        }
+        //Bounding sphere intersection
+        /*if(magnitude > self.diagonal + other.diagonal)
+            return false;*/
+
+        DoubleVector3 translationInSelfCoords = self.particle.ProjectToSelfCoordinates(translation);
+
+        // Test axes L = A0, L = A1, L = A2
+        if (!PBDColliderBox.TestFaceParallelAxis(self, other, selfAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 0, 0))
+            return false;
+        if (!PBDColliderBox.TestFaceParallelAxis(self, other, selfAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 1, 1))
+            return false;
+        if (!PBDColliderBox.TestFaceParallelAxis(self, other, selfAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 2, 2))
+            return false;
+
+        // Test axes L = B0, L = B1, L = B2
+        if (!PBDColliderBox.TestFaceParallelAxisB(self, other, otherAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 0, 3))
+            return false;
+        if (!PBDColliderBox.TestFaceParallelAxisB(self, other, otherAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 1, 4))
+            return false;
+        if (!PBDColliderBox.TestFaceParallelAxisB(self, other, otherAxes, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 2, 5))
+            return false;
+        // Test 9 axes L = Ai X Bj    , i = j = 0,1,2
+        if (!PBDColliderBox.TestCrossProductAxises(self, other, R, AbsR, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes, translationInSelfCoords, 6))
+            return false;
+
+        // Since no separating axis is found, the OBBs must be intersecting
+
+        PBDColliderBox.CreateCollision(self, other, PBDColliderBox.separatingDistances, PBDColliderBox.separatingAxes,  collision);
+
+
+        return true;
     }
 }

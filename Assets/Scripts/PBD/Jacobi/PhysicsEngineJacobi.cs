@@ -31,8 +31,10 @@ public class PhysicsEngineJacobi : PhysicsEngine
         }
         ApplyCorrections();
         ClearCorrections();
-        RecalcVelocities(h);
+    }
 
+    protected override void CollisionSolve(double h)
+    {
         if (optimizeCollisionDetection)
         {
             if (!performBroadPhaseOncePerSimStep)

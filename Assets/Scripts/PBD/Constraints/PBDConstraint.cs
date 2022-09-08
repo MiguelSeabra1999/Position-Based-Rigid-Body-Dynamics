@@ -39,7 +39,7 @@ public abstract class PBDConstraint
         {
             double gradientMag = GetGradientMagnitude(i);
             double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
-            denominator += wi  * gradientMag;
+            denominator += wi  * gradientMag * gradientMag;
         }
         denominator += compliance / (deltaTime * deltaTime);
 
@@ -118,7 +118,7 @@ public abstract class PBDConstraint
             if (bodies[i].inverseMass != 0)
             {
                 double gradientMag = GetGradientMagnitude(i);
-                DoubleVector3 correction = GetGradient(i) *   lagrangeMult *  (1 / bodies[i].mass);
+                DoubleVector3 correction = GetGradient(i) * gradientMag *   lagrangeMult *  (1 / bodies[i].mass);
                 bodies[i].position += GetSign(i) * correction;
                 UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
 

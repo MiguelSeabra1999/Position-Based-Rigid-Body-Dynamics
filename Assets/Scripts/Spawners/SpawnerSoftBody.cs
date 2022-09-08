@@ -48,6 +48,12 @@ public class SpawnerSoftBody : MonoBehaviour
     void Update()
     {
         CreateMesh();
+        if (Input.GetKey(KeyCode.P))
+            foreach (Particle p in particles)
+            {
+                p.position = new DoubleVector3(p.position.x, 0.5f, p.position.z);
+                p.prevPosition = p.position;
+            }
     }
 
     private void CreateMesh()
@@ -252,7 +258,7 @@ public class SpawnerSoftBody : MonoBehaviour
         AddVolumeConstraint(particles[x + 1, y, z + 1], particles[x, y, z + 1], particles[x + 1, y + 1, z + 1], particles[x + 1, y, z]);
 
 
-        //  AddVolumeConstraint(p[x+1,y+1,z+1], p[x,y+1,z], p[x+1,y,z], p[x,y,z+1]);
+        AddVolumeConstraint(particles[x + 1, y + 1, z + 1], particles[x, y + 1, z], particles[x + 1, y, z], particles[x, y, z + 1]);
     }
 
     private void MakeCube(Vector3 pos)

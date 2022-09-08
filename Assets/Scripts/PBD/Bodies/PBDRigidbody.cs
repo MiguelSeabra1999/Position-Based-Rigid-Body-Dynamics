@@ -105,7 +105,7 @@ public class PBDRigidbody : Particle
 
     public override void ApplyCorrectionOrientation(DoubleVector3 correction, double sign, DoubleVector3 offset) //used in constraints
     {
-        DoubleVector3 prevPos = position + orientation * offset;
+        //   DoubleVector3 prevPos = position + orientation * offset;
 
         correction = ProjectToSelfCoordinates(correction);
         DoubleVector3 torque = DoubleVector3.Cross(offset, correction);
@@ -113,7 +113,7 @@ public class PBDRigidbody : Particle
         orientation += sign * 0.5 * torque * orientation;
         orientation =   DoubleQuaternion.Normal(orientation);
 
-        DoubleVector3 newPos = position + orientation * offset;
+        //   DoubleVector3 newPos = position + orientation * offset;
         // position += (prevPos - newPos);
     }
 
@@ -227,7 +227,7 @@ public class PBDRigidbody : Particle
         //   return inverseMass;
         if (inverseMass == 0)
             return 0;
-        correctionDir = ProjectToSelfCoordinates(correctionDir);
+        correctionDir = orientation.Inverse() * correctionDir;
 
         DoubleVector3 aux = correctionDir * inertiaTensorInverted;
         return DoubleVector3.Dot(aux, correctionDir);

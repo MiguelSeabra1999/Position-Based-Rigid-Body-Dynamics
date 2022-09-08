@@ -42,29 +42,19 @@ public class HingeConstraint : PBDAngularConstraint
     public override double Evaluate()
     {
         DoubleVector3 worldA1 = bodies[0].GetOrientation() * a1;
-
-
         DoubleVector3 worldA2 = bodies[1].GetOrientation() * a2;
+        DoubleVector3 worldRotAxis = bodies[0].GetOrientation() * rotAxis;
+
+        DoubleVector3 error = DoubleVector3.Cross(worldA1, worldA2);
+        deltaRotTarget = DoubleVector3.Normal(error);
 
 
-        deltaRotTarget = LimitAngle(rotAxis, worldA1, worldA2, 0, 0);
-
-
-        DoubleVector3 parallelComponent = DoubleVector3.Dot(deltaRotTarget, rotAxis) * rotAxis;
-        DoubleVector3 perpComponent = deltaRotTarget - parallelComponent;
-
-        deltaRotTarget = parallelComponent;
-
-        double angle = Math.Asin(Math.Min(DoubleVector3.Magnitude(deltaRotTarget), 1));
-
-        Debug.Log("angle " + angle * Constants.Rad2Deg);
-        Debug.Log(deltaRotTarget);
-        return angle;
+        return DoubleVector3.Magnitude(error);
     }
 
     protected override DoubleVector3 GetGradient(int i)
     {
-        return DoubleVector3.Normal(deltaRotTarget);
+        return deltaRotTarget;
     }
 
     protected override double GetSign(int i)
@@ -74,14 +64,14 @@ public class HingeConstraint : PBDAngularConstraint
         return -1;
     }
 
-    public override void Solve(double deltaTime)
-    {
-        base.Solve(deltaTime);
-        double newError = Evaluate();
-        if (newError >= 0.1)
-        {
-            Debug.Log("Hinge diverge" + newError);
-            // Debug.Break();
-        }
-    }
+    /* public override void Solve(double deltaTime)
+     {
+         base.Solve(deltaTime);
+         double newError = Evaluate();
+         if (newError >= 0.1)
+         {
+             Debug.Log("Hinge diverge" + newError);
+             // Debug.Break();
+         }
+     }*/
 }

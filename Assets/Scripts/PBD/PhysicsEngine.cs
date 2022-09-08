@@ -28,6 +28,7 @@ public  class PhysicsEngine : MonoBehaviour
     public List<BallJointConstraint> ballJointConstraint = new List<BallJointConstraint>();
     public List<TwistConstraint> twistConstraint = new List<TwistConstraint>();
     public List<HingeConstraint> hingeConstraint = new List<HingeConstraint>();
+    public List<AlignAngleConstraint> alignAngleConstraint = new List<AlignAngleConstraint>();
     public List<VolumeConstraint> volumeConstraint = new List<VolumeConstraint>();
 
     public CollisionEngine collisionEngine = new CollisionEngine();
@@ -44,6 +45,10 @@ public  class PhysicsEngine : MonoBehaviour
         allParticles = GetComponentsInChildren<PBDParticle>();
         allRigidbodies = GetComponentsInChildren<PBDRigidbody>();
         monoBehaviours = GetComponentsInChildren<PBDMonoBehaviour>();
+        foreach (AlignAngleConstraint c in alignAngleConstraint)
+        {
+            constraints.Add(c);
+        }
         foreach (BallJointConstraint c in ballJointConstraint)
         {
             constraints.Add(c);
@@ -81,6 +86,8 @@ public  class PhysicsEngine : MonoBehaviour
         {
             PositionalUpdate(h);
             ConstraintSolve(h);
+            RecalcVelocities(h);
+            CollisionSolve(h);
             VelocitySolve(h);//Collision Handling
 
 
@@ -159,8 +166,10 @@ public  class PhysicsEngine : MonoBehaviour
             PBDConstraint constraint = constraints[i];
             constraint.Solve(h);
         }
-        RecalcVelocities(h);
+    }
 
+    protected virtual void CollisionSolve(double h)
+    {
         if (optimizeCollisionDetection)
         {
             if (!performBroadPhaseOncePerSimStep)

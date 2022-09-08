@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7f7b477acfce74790f94fef77f0e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selfCollisions: 1
+  selfCollisions: 0
   stepByStep: 0
   optimizeCollisionDetection: 1
   performBroadPhaseOncePerSimStep: 1
@@ -216,6 +216,7 @@ MonoBehaviour:
   ballJointConstraint: []
   twistConstraint: []
   hingeConstraint: []
+  alignAngleConstraint: []
   volumeConstraint: []
 --- !u!4 &343347077
 Transform:
@@ -441,7 +442,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.015707303, y: 0, z: 0, w: 0.9998767}
-  m_LocalPosition: {x: 0, y: 2.8, z: -14}
+  m_LocalPosition: {x: 0, y: 0.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1346,7 +1347,7 @@ GameObject:
   - component: {fileID: 1872990807}
   - component: {fileID: 1872990806}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Jelly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1360,7 +1361,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872990803}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: -1, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1379,12 +1380,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69d2ef4d1853233458ff20e7e377a7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawParticleMeshes: 1
+  drawParticleMeshes: 0
   prefabSO: {fileID: 11400000, guid: 1680daca5aba1b443ad41594f7313133, type: 2}
   compliance: 0.0001
   friction: 0.2
   edge: 0.3
-  dims: {x: 5, y: 5, z: 5}
+  dims: {x: 5, y: 8, z: 5}
 --- !u!23 &1872990806
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1817,6 +1818,7 @@ MonoBehaviour:
   ballJointConstraint: []
   twistConstraint: []
   hingeConstraint: []
+  alignAngleConstraint: []
   volumeConstraint: []
 --- !u!114 &3971845553521064830
 MonoBehaviour:

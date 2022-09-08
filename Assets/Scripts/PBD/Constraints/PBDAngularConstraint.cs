@@ -38,41 +38,14 @@ public abstract class PBDAngularConstraint : PBDConstraint
 
         for (int i = 0; i < bodies.Count; i++)
         {
-            //Debug.DrawLine(bodies[i].position.ToVector3(), (bodies[i].position + correction).ToVector3(), Color.yellow);
-            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i));
-            //  Debug.Log("error " + error + " lag " + lagrangeMult*wi);
-            // DoubleQuaternion correction = new DoubleQuaternion(lagrangeMult*wi*Constants.Rad2Deg, GetGradient(i));
+            if (bodies[i].inverseMass == 0)
+                continue;
+            DoubleVector3 p = GetGradient(i) *  lagrangeMult;
+            p = bodies[i].GetOrientation().Inverse() * p;
+            DoubleVector3 correction = bodies[i].GetOrientation() * (bodies[i].GetInertiaTensorInverted() * p);
+            DoubleQuaternion correctionQ = 0.5 * new DoubleQuaternion(0, correction.x, correction.y, correction.z) * bodies[i].GetOrientation();
 
-            /*  if (wi == 0)
-                  continue;
-              DoubleVector3 corr = GetGradient(i) * lagrangeMult;
-              corr = bodies[i].GetOrientation().Inverse() * corr;
-              corr = bodies[i].GetInertiaTensorInverted() * corr;
-              corr = bodies[i].GetOrientation() * corr;
-
-
-              bodies[i].SetRotation(bodies[i].GetOrientation() + GetSign(i) * 0.5 * corr * bodies[i].GetOrientation());*/
-
-
-            DoubleQuaternion correction = (GetSign(i) * GetGradient(i) * lagrangeMult * wi).ToQuaternion();
-            bodies[i].SetRotation(DoubleQuaternion.Normal(correction * bodies[i].GetOrientation()));
-            /*if(i == 1)
-            {
-            Debug.Log("correction " + GetGradient(i)*lagrangeMult*wi*Constants.Rad2Deg);
-            Debug.Log("gradient " + GetGradient(i));
-            Debug.Log("lagrange " + lagrangeMult*Constants.Rad2Deg);
-            Debug.Log("wi " + wi);
-            Debug.Log("rotation " + bodies[i].GetOrientation().ToEuler()*Constants.Rad2Deg);
-
-            }*/
-            //continue;
-
-            /*
-              DoubleVector3 correctionVec = GetGradient(i) * lagrangeMult * wi;
-               DoubleVector3 correctionSelfCoords = bodies[i].ProjectToSelfCoordinates(correctionVec);
-
-              correctionSelfCoords = bodies[i].GetInertiaTensorInverted()*correctionSelfCoords;
-              correctionVec = bodies[i].GetOrientation()*correctionSelfCoords;*/
+            bodies[i].SetRotation(bodies[i].GetOrientation() + GetSign(i) * correctionQ);
         }
     }
 

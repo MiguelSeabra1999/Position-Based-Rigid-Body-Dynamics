@@ -143,7 +143,7 @@ public abstract class Particle : MonoBehaviour
 
     public virtual void UpdateVelocity(double h)
     {
-        velocity += new DoubleVector3(0, -1, 0) * PhysicsEngine.gravForce * h * gravityScale;
+        externalForce = new DoubleVector3(0, -1, 0) * PhysicsEngine.gravForce * gravityScale;
         velocity += externalForce * h;
     }
 

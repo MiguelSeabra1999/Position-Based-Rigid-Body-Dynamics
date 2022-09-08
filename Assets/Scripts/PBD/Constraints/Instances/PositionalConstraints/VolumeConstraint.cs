@@ -68,9 +68,9 @@ public class VolumeConstraint : PBDConstraint
 
     protected override double GetGradientMagnitude(int bodyIndex)
     {
-        return 0.5;
+        // return 1;
         //   Debug.Log("mag " + DoubleVector3.Magnitude(gradients[bodyIndex]));
-        //return DoubleVector3.Magnitude(gradients[bodyIndex]);
+        return DoubleVector3.Magnitude(gradients[bodyIndex]);
     }
 
     public override double Evaluate()
@@ -85,7 +85,7 @@ public class VolumeConstraint : PBDConstraint
             gradients[i] = DoubleVector3.Normal(CalcGradient(i));
         }
 
-        //Debug.Log(currentVolume);
+//        Debug.Log(currentVolume);
         return error;
     }
 
