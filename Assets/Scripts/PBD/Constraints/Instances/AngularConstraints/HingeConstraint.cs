@@ -22,6 +22,7 @@ public class HingeConstraint : PBDAngularConstraint
 
     private DoubleVector3 deltaRotTarget = new DoubleVector3(0);
 
+
     public override void Init(Particle[] allParticles)
     {
         base.Init(allParticles);
@@ -68,9 +69,9 @@ public class HingeConstraint : PBDAngularConstraint
      {
          base.Solve(deltaTime);
          double newError = Evaluate();
-         if (newError >= 0.1)
+         if (newError >= 0.01)
          {
-             Debug.Log("Hinge diverge" + newError);
+             Debug.Log("Hinge diverge" + newError );
              // Debug.Break();
          }
      }*/

@@ -24,6 +24,8 @@ public  class PBDCollision
     public double velocityNormal, prevVelocityNormal;
     public PBDFrictionCollision frictionCol;
     public bool hasFriction = true;
+    public bool hasStaticFriction = true;
+    public bool hasDynamicFriction = true;
 
     public PBDCollision()
     {
@@ -106,13 +108,17 @@ public  class PBDCollision
         this.prevVelocityNormal = c.prevVelocityNormal;
         this.frictionCol = c.frictionCol;
         this.hasFriction = c.hasFriction;
+        this.hasStaticFriction = c.hasStaticFriction;
     }
 
     private void InitCollision()
     {
         frictionCol = PBDFrictionCollision.GetNewFrictionCollision();
 
-        hasFriction = ((a.staticFrictionCoefficient != 0 && b.staticFrictionCoefficient != 0) || (a.dynamicFrictionCoefficient != 0  && b.dynamicFrictionCoefficient != 0));
+        hasStaticFriction = a.staticFrictionCoefficient != 0 && b.staticFrictionCoefficient != 0;
+        hasDynamicFriction = a.dynamicFrictionCoefficient != 0 && b.dynamicFrictionCoefficient != 0;
+        hasFriction = hasStaticFriction || hasDynamicFriction;
+
         a.wasInCollision = true;
         b.wasInCollision = true;
 
@@ -204,13 +210,15 @@ public  class PBDCollision
         if (!fricCol.appliedStaticFriction)
         {
 //                Debug.Log("dynamic");
-            ApplyDynamicFriction(particle, r, fricCol, sign, h);
+            if (hasDynamicFriction)
+                ApplyDynamicFriction(particle, r, fricCol, sign, h);
         }
         /**/
         else
         {
             //   Debug.Log("static");
-            ApplyStaticFriction(particle, fricCol, r, h, sign);
+            if (hasStaticFriction)
+                ApplyStaticFriction(particle, fricCol, r, h, sign);
         }
     }
 

@@ -88,7 +88,7 @@ public  class PhysicsEngine : MonoBehaviour
             ConstraintSolve(h);
             RecalcVelocities(h);
             CollisionSolve(h);
-            VelocitySolve(h);//Collision Handling
+            // VelocitySolve(h);//Collision Handling
 
 
             InvokePhysicsUpdate(h);

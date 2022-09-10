@@ -24,13 +24,20 @@ public readonly struct DoubleQuaternion
 
     public DoubleQuaternion(double angle, DoubleVector3 axis)
     {
-        DoubleVector3 axisNormal = DoubleVector3.Normal(axis);
+        /*DoubleVector3 axisNormal = DoubleVector3.Normal(axis);
         double a = angle * Constants.Deg2Rad;
         w = Math.Cos(a / 2);
         double s = Math.Sin(a / 2);
         x = axisNormal.x * s;
         y = axisNormal.y * s;
-        z = axisNormal.z * s;
+        z = axisNormal.z * s;*/
+        DoubleQuaternion neutral = new DoubleQuaternion(1, 0, 0, 0);
+        DoubleVector3 rotVec = angle * axis;
+        DoubleQuaternion q = neutral + 0.5 * new DoubleQuaternion(0, rotVec.x, rotVec.y, rotVec.z) * neutral;
+        x = q.x;
+        y = q.y;
+        z = q.z;
+        w = q.w;
     }
 
     public DoubleQuaternion(DoubleVector3 vector)

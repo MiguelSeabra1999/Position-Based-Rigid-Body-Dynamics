@@ -43,6 +43,7 @@ public abstract class PBDAngularConstraint : PBDConstraint
             DoubleVector3 p = GetGradient(i) *  lagrangeMult;
             p = bodies[i].GetOrientation().Inverse() * p;
             DoubleVector3 correction = bodies[i].GetOrientation() * (bodies[i].GetInertiaTensorInverted() * p);
+            //DoubleVector3 correction = GetGradient(i) * bodies[i].GetGeneralizedInverseMass(GetGradient(i));
             DoubleQuaternion correctionQ = 0.5 * new DoubleQuaternion(0, correction.x, correction.y, correction.z) * bodies[i].GetOrientation();
 
             bodies[i].SetRotation(bodies[i].GetOrientation() + GetSign(i) * correctionQ);
@@ -55,15 +56,16 @@ public abstract class PBDAngularConstraint : PBDConstraint
         DoubleVector3 cross = DoubleVector3.Cross(n1, n2);
         double fi = Math.Asin(DoubleVector3.Dot(cross, n));
         if (DoubleVector3.Dot(n1, n2) < 0)
-            fi = Math.PI - fi;
+            fi = 2 * Math.PI - fi;
         if (fi > Math.PI)
             fi = fi - 2 * Math.PI;
         if (fi < -Math.PI)
             fi = fi + 2 * Math.PI;
         if (fi < a || fi > b)
         {
-            //fi = Math.Clamp(fi, a, b);
-            n1 = DoubleVector3.Rotate(n1, n, fi);
+            fi = Math.Clamp(fi, a, b);
+            n1 = new DoubleQuaternion(fi, n) * n1;
+            DoubleVector3.Cross(n1, n2);
             return DoubleVector3.Cross(n1, n2);
         }
         return new DoubleVector3(0);

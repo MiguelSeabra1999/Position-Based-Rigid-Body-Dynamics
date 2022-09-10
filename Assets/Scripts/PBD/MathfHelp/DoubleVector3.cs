@@ -255,7 +255,9 @@ public readonly struct DoubleVector3
 
     public static double AngleBetween(DoubleVector3 a, DoubleVector3 b)
     {
-        return Math.Acos((DoubleVector3.Dot(a, b)) / (DoubleVector3.Magnitude(a) * DoubleVector3.Magnitude(b)));
+        double cos = DoubleVector3.Dot(a, b) / (DoubleVector3.Magnitude(a) * DoubleVector3.Magnitude(b));
+
+        return Math.Acos(cos);
     }
 
     public static double SignedAngleBetween(DoubleVector3 a, DoubleVector3 b, DoubleVector3 normal)

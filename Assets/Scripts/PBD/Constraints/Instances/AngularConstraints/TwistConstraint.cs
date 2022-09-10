@@ -51,22 +51,32 @@ public class TwistConstraint : PBDAngularConstraint
 
     public override double Evaluate()
     {
+        DoubleVector3 worldA1 = bodies[0].GetOrientation() * a1;
+        DoubleVector3 worldA2 = bodies[1].GetOrientation() * a2;
         DoubleVector3 up = new DoubleVector3(Vector3.up);
-        double angle0 =  DoubleVector3.AngleBetween(bodies[0].up, up);
-        DoubleVector3 dir0 = DoubleVector3.Cross(bodies[0].up, up);
+
+        double angle0 =  DoubleVector3.AngleBetween(worldA1, up);
+        DoubleVector3 dir0 = DoubleVector3.Cross(worldA1, up);
         DoubleQuaternion body0rot = new DoubleQuaternion(angle0, dir0);
-        double angle1 =  DoubleVector3.AngleBetween(bodies[1].up, up);
-        DoubleVector3 dir1 = DoubleVector3.Cross(bodies[1].up, up);
+
+        double angle1 =  DoubleVector3.AngleBetween(worldA2, up);
+        DoubleVector3 dir1 = DoubleVector3.Cross(worldA2, up);
         DoubleQuaternion body1rot = new DoubleQuaternion(angle1, dir1);
 
         DoubleQuaternion body0oriented = body0rot * bodies[0].GetOrientation();
         DoubleQuaternion body1oriented = body1rot * bodies[1].GetOrientation();
 
-        DoubleQuaternion error = body0oriented * body1oriented.Inverse();
-        deltaRotTarget = error.ToEuler();
+
+        DoubleVector3 orientedB1 = body0oriented * b1;
+        DoubleVector3 orientedB2 = body1oriented * b2;
 
 
-        return DoubleVector3.Magnitude(deltaRotTarget);
+
+
+        double angle = DoubleVector3.SignedAngleBetween(orientedB1, orientedB2, a1);
+
+
+        return angle;
     }
 
 /*  public override double Evaluate()
@@ -95,24 +105,29 @@ public class TwistConstraint : PBDAngularConstraint
 
     protected override DoubleVector3 GetGradient(int i)
     {
-        return DoubleVector3.Normal(deltaRotTarget);
+        DoubleVector3 axis;
+        if (i == 0)
+            axis = a1;
+        else
+            axis = a2;
+        return bodies[i].GetOrientation() * axis;
     }
 
     protected override double GetSign(int i)
     {
         if (i == 0)
-            return -1;
-        return 1;
+            return 1;
+        return -1;
     }
 
-    public override void Solve(double deltaTime)
-    {
-        base.Solve(deltaTime);
-        double newError = Evaluate();
-        if (newError >= 0.1)
-        {
-            Debug.Log("Twist diverge" + newError);
-            // Debug.Break();
-        }
-    }
+    /* public override void Solve(double deltaTime)
+     {
+         base.Solve(deltaTime);
+         double newError = Evaluate();
+         if (newError >= 0.1)
+         {
+             Debug.Log("Twist diverge" + newError);
+             // Debug.Break();
+         }
+     }*/
 }

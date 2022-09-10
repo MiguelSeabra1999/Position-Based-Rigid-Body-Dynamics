@@ -66,6 +66,12 @@ public class StaticFrictionConstraint : PBDConstraint
         DoubleVector3 deltaPosT = deltaPos - DoubleVector3.Dot(deltaPos, col.normal) * col.normal;
         gradient = DoubleVector3.Normal(deltaPosT);
         error = DoubleVector3.Magnitude(deltaPosT);
+        if (DoubleVector3.Magnitude(col.a.velocity) > 0 || DoubleVector3.Magnitude(col.b.velocity) > 0)
+        {
+            Debug.Log("applying");
+            Debug.Log("error " + error);
+
+        }
         return error;
     }
 
@@ -74,6 +80,9 @@ public class StaticFrictionConstraint : PBDConstraint
         double staticFrictionCoefficient = (col.a.staticFrictionCoefficient + col.b.staticFrictionCoefficient) / 2;
 
         frictionCol.tangencialDir = gradient;
+
+        if (!col.hasStaticFriction)
+            return true;
 
 
         if (Math.Abs(normalConstraint.lagrangeMult) * staticFrictionCoefficient <= Math.Abs(lagrangeMult))
