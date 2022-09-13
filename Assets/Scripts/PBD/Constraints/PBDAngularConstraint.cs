@@ -33,7 +33,7 @@ public abstract class PBDAngularConstraint : PBDConstraint
         lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
 
 
-        if (LagrangeMultConstraint())
+        if (LagrangeMultConstraint(deltaTime))
             return;
 
         for (int i = 0; i < bodies.Count; i++)

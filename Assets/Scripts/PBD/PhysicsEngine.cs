@@ -88,7 +88,8 @@ public  class PhysicsEngine : MonoBehaviour
             ConstraintSolve(h);
             RecalcVelocities(h);
             CollisionSolve(h);
-            // VelocitySolve(h);//Collision Handling
+            // RecalcVelocities(h);
+            VelocitySolve(h);//Collision Handling
 
 
             InvokePhysicsUpdate(h);
@@ -126,6 +127,9 @@ public  class PhysicsEngine : MonoBehaviour
         collisionEngine.LoopCollisions(
             (c) => c.HandleCollision(h)
         );
+        /* collisionEngine.LoopCollisions(
+             (c) => c.HandleFriction(h)
+         );*/
     }
 
     protected void RecalcVelocities(double h)

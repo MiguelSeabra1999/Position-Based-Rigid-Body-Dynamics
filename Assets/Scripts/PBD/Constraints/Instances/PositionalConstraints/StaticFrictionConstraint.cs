@@ -62,20 +62,19 @@ public class StaticFrictionConstraint : PBDConstraint
         DoubleVector3 p2 = col.b.position + col.b.GetOrientation() * col.rB;
         DoubleVector3 p2Prev = col.b.prevPosition + col.b.GetPrevOrientation() * col.rB;
 
-        DoubleVector3 deltaPos = (p1 - p2) - (p1Prev - p2Prev);
+        DoubleVector3 deltaPos = (p1 - p1Prev) - (p2 - p2Prev);
         DoubleVector3 deltaPosT = deltaPos - DoubleVector3.Dot(deltaPos, col.normal) * col.normal;
         gradient = DoubleVector3.Normal(deltaPosT);
         error = DoubleVector3.Magnitude(deltaPosT);
-        if (DoubleVector3.Magnitude(col.a.velocity) > 0 || DoubleVector3.Magnitude(col.b.velocity) > 0)
-        {
-            Debug.Log("applying");
-            Debug.Log("error " + error);
-
-        }
+        /* if (DoubleVector3.Magnitude(col.a.velocity) > 0 || DoubleVector3.Magnitude(col.b.velocity) > 0)
+         {
+             Debug.Log("applying");
+             Debug.Log("error " + error);
+         }*/
         return error;
     }
 
-    protected override bool LagrangeMultConstraint()
+    protected override bool LagrangeMultConstraint(double h)
     {
         double staticFrictionCoefficient = (col.a.staticFrictionCoefficient + col.b.staticFrictionCoefficient) / 2;
 
@@ -116,13 +115,14 @@ public class StaticFrictionConstraint : PBDConstraint
     }
 
 /*
-    protected override void UpdateOrientation(DoubleVector3 correction, int index, double sign)
+    protected override void UpdateOrientation(DoubleVector3 correction, double sign , int index )
     {
 
         DoubleVector3 bodyOffset = GetBodyR(index);
         //Debug.Log(bodies[index].gameObject.name  + bodyOffset);
         if(DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
-            bodies[index].ApplyCorrectionOrientation(correction,bodyOffset, sign);
+            bodies[index].ApplyCorrectionOrientation(correction,sign,bodyOffset);
 
-    }*/
+    }
+    */
 }

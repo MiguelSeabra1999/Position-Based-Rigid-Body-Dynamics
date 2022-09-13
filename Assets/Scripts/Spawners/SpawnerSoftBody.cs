@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SpawnerSoftBody : MonoBehaviour
 {
+    public bool createOnAwake = true;
     public bool drawParticleMeshes = true;
     public PrefabSO prefabSO;
     public double compliance = 0;
@@ -11,21 +12,22 @@ public class SpawnerSoftBody : MonoBehaviour
     public float edge = 1;
     public Vector3Int dims = new Vector3Int(1, 1, 1);
     private PhysicsEngine engine;
-    private Particle[,,] particles = new Particle[2, 2, 2];
+    public Particle[,,] particles = new Particle[2, 2, 2];
     private bool[,] connected = new bool[8, 8];
 
     private int id = 0;
 
-    private List<Vector3> newVertices = new List<Vector3>();
-    private List<Vector2> newUV = new List<Vector2>();
-    private List<int> newTriangles = new List<int>();
-    private MeshFilter meshFilter;
-    private Mesh mesh;
+    [HideInInspector] public List<Vector3> newVertices = new List<Vector3>();
+    [HideInInspector] public List<Vector2> newUV = new List<Vector2>();
+    [HideInInspector] public List<int> newTriangles = new List<int>();
+    [HideInInspector] public MeshFilter meshFilter;
+    [HideInInspector] public Mesh mesh;
 
 
     void Awake()
     {
-        Init();
+        if (createOnAwake)
+            Init();
     }
 
     [ContextMenu("createSoftBody")]
@@ -43,6 +45,7 @@ public class SpawnerSoftBody : MonoBehaviour
 
         MakeCube(transform.position);
         AddNeighbors();
+        CreateMesh();
     }
 
     void Update()
@@ -312,7 +315,7 @@ public class SpawnerSoftBody : MonoBehaviour
         obj.GetComponent<PBDColliderSphere>().radius = 0.125;
         obj.transform.SetParent(transform);
         Particle p = obj.GetComponent<Particle>();
-        p.staticFrictionCoefficient = friction;
+        p.staticFrictionCoefficient = 0;
         p.dynamicFrictionCoefficient = friction;
         obj.name = "" + id++;
 

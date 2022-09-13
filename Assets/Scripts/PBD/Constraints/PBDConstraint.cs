@@ -26,7 +26,7 @@ public abstract class PBDConstraint
     protected abstract DoubleVector3 GetGradient(int i);
     protected abstract double GetSign(int i);
 
-    protected virtual bool LagrangeMultConstraint() {return false;}
+    protected virtual bool LagrangeMultConstraint(double h) {return false;}
     protected virtual DoubleVector3 GetBodyR(int index)
     {
         return new DoubleVector3(0, 0, 0);
@@ -58,7 +58,7 @@ public abstract class PBDConstraint
 
         lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
 
-        if (LagrangeMultConstraint())
+        if (LagrangeMultConstraint(deltaTime))
             return;
 
         for (int i = 0; i < bodies.Count; i++)
@@ -105,7 +105,7 @@ public abstract class PBDConstraint
         lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
 
 
-        if (LagrangeMultConstraint())
+        if (LagrangeMultConstraint(deltaTime))
             return;
 
         for (int i = 0; i < bodies.Count; i++)

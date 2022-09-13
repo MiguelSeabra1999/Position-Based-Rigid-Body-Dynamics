@@ -231,7 +231,7 @@ public abstract class PBDCollider : MonoBehaviour
         double yDiff = self.particle.position.y - lessYpoint.y;
         DoubleVector3 normal = new DoubleVector3(0, 1, 0);
         DoubleVector3 correction = new DoubleVector3(0, yDiff, 0);
-
+        other.pos = lessYpoint.ToVector3();
         collision.LoadNewValues(self.particle, other.particle, normal, correction, lessYpoint);
         return true;
     }

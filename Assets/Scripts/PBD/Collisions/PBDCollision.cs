@@ -217,8 +217,8 @@ public  class PBDCollision
         else
         {
             //   Debug.Log("static");
-            if (hasStaticFriction)
-                ApplyStaticFriction(particle, fricCol, r, h, sign);
+            /*     if (hasStaticFriction)
+                     ApplyStaticFriction(particle, fricCol, r, h, sign);*/
         }
     }
 

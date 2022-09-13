@@ -70,12 +70,12 @@ public abstract class Particle : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        //Handles.Label(transform.position, "v:" + DoubleVector3.Magnitude(velocity));
+        Handles.Label(transform.position, "v:" + DoubleVector3.Magnitude(velocity));
     }
 
     public virtual void PBDupdate()
     {
-        // DrawLine();
+        DrawLine();
     }
 
     public virtual void PBDphysicsUpdate()
