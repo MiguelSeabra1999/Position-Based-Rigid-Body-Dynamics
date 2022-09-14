@@ -37,6 +37,7 @@ public  class PhysicsEngine : MonoBehaviour
     /*protected List<PBDCollision> collisions = new List<PBDCollision>();
     protected  PBDCollision  col;*/
     // public double accuracy = 0.00001;
+    private double prevTime = 0;
 
 
     protected virtual void Start()
@@ -74,11 +75,20 @@ public  class PhysicsEngine : MonoBehaviour
 
         foreach (PBDConstraint c in constraints)
             c.Init(allBodies);
+
+        prevTime = Time.realtimeSinceStartupAsDouble;
     }
 
     protected virtual void Update()
     {
-        double h = Time.deltaTime / substeps;
+        double deltaTime = Time.realtimeSinceStartupAsDouble - prevTime;
+
+        Debug.Log("unity " + Time.deltaTime);
+        Debug.Log("mine " + deltaTime);
+        int fps = (int)(1.0 / deltaTime);
+
+        Debug.Log("fps: " + fps);
+        double h = deltaTime / substeps;
 
         if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep && selfCollisions)
             collisionEngine.BroadCollisionDetection();
@@ -97,6 +107,7 @@ public  class PhysicsEngine : MonoBehaviour
         }
         UpdateActualPositions();
         InvokeUpdate();
+        prevTime = Time.realtimeSinceStartupAsDouble;
     }
 
     private void InvokePhysicsUpdate(double h)

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class TimeScaleManager : MonoBehaviour
 {
-    [Range(0.01f,5.0f)] public float timeScale = 1;
+    [Range(0.01f, 5.0f)] public float timeScale = 1;
+    public int targetFPS = 60;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,5 +16,6 @@ public class TimeScaleManager : MonoBehaviour
     void Update()
     {
         Time.timeScale = timeScale;
+        Application.targetFrameRate = targetFPS;
     }
 }
