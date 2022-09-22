@@ -20,7 +20,6 @@ public class AlignAngleConstraint : PBDAngularConstraint
     private DoubleVector3 deltaRotTarget = new DoubleVector3(0);
     public override void Init(Particle[] allParticles)
     {
-        base.Init(allParticles);
         a1 = DoubleVector3.Normal(new DoubleVector3(_a1));
         /*  b1 = DoubleVector3.Normal(new DoubleVector3(_b1));
           c1 = DoubleVector3.Normal(new DoubleVector3(_c1));*/
@@ -30,7 +29,9 @@ public class AlignAngleConstraint : PBDAngularConstraint
          r1 = new DoubleVector3(_r1);
          r2 = new DoubleVector3(_r2);*/
         bodies.Add(body);
-        bodies.Add(otherBody);
+        if (otherBody != null)
+            bodies.Add(otherBody);
+        base.Init(allParticles);
     }
 
     protected override double GetGradientMagnitude(int i)
@@ -41,11 +42,20 @@ public class AlignAngleConstraint : PBDAngularConstraint
     public override double Evaluate()
     {
         DoubleVector3 worldA1 = bodies[0].GetOrientation() * a1;
-        DoubleVector3 worldA2 = bodies[1].GetOrientation() * a2;
+        DoubleVector3 worldA2;
         DoubleQuaternion a1Q = new DoubleQuaternion(worldA1);
-        DoubleQuaternion a2Q = new DoubleQuaternion(worldA1);
+        DoubleQuaternion q;
+        if (otherBody != null)
+        {
+            worldA2 = bodies[1].GetOrientation() * a2;
+            DoubleQuaternion a2Q = new DoubleQuaternion(worldA2);
+            q = bodies[0].GetOrientation() * bodies[1].GetOrientation().Inverse();
+        }
+        else
+        {
+            q = bodies[0].GetOrientation() * new DoubleQuaternion(0, a1).Inverse();
+        }
 
-        DoubleQuaternion q = bodies[0].GetOrientation() * bodies[1].GetOrientation().Inverse();
         // Debug.Log("diff " + q.ToEuler() * Constants.Rad2Deg);
         deltaRotTarget = 2 * q.VectorPart();
         //  Debug.Log(DoubleVector3.Magnitude(deltaRotTarget) * Constants.Rad2Deg);

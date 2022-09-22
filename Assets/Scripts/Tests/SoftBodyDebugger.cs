@@ -12,7 +12,7 @@ public class SoftBodyDebugger : PhysicsEngine
         allRigidbodies = GetComponentsInChildren<PBDRigidbody>();
         foreach (VolumeConstraint c in volumeConstraint)
         {
-            constraints.Add(c);
+            volumeConstraint.Add(c);
         }
 
         foreach (PBDConstraint c in constraints)
@@ -34,7 +34,7 @@ public class SoftBodyDebugger : PhysicsEngine
 
     protected override void ConstraintSolve(double h)
     {
-        for (int i = 0; i < constraints.Count; i++)
+        for (int i = 0; i < constraints.Length; i++)
         {
             PBDConstraint constraint = constraints[i];
             constraint.Solve(h);

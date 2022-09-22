@@ -24,7 +24,7 @@ public class PhysicsEngineJacobi : PhysicsEngine
             PBDConstraint constraint = temporaryConstraints[i];
             constraint.GetContribution(h, corrections);
         }
-        for (int i = 0; i < constraints.Count; i++)
+        for (int i = 0; i < constraints.Length; i++)
         {
             PBDConstraint constraint = constraints[i];
             constraint.GetContribution(h, corrections);

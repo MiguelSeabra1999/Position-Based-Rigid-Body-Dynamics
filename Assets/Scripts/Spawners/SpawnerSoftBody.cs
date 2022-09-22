@@ -315,7 +315,7 @@ public class SpawnerSoftBody : MonoBehaviour
         obj.GetComponent<PBDColliderSphere>().radius = 0.125;
         obj.transform.SetParent(transform);
         Particle p = obj.GetComponent<Particle>();
-        p.staticFrictionCoefficient = 0;
+        p.staticFrictionCoefficient = friction;
         p.dynamicFrictionCoefficient = friction;
         obj.name = "" + id++;
 

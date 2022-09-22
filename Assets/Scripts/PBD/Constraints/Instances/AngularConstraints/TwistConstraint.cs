@@ -31,7 +31,6 @@ public class TwistConstraint : PBDAngularConstraint
 
     public override void Init(Particle[] allParticles)
     {
-        base.Init(allParticles);
         a1 = DoubleVector3.Normal(new DoubleVector3(_a1));
         b1 = DoubleVector3.Normal(new DoubleVector3(_b1));
         //c1 = DoubleVector3.Normal(new DoubleVector3(_c1));
@@ -42,6 +41,7 @@ public class TwistConstraint : PBDAngularConstraint
         r2 = new DoubleVector3(_r2);*/
         bodies.Add(body);
         bodies.Add(otherBody);
+        base.Init(allParticles);
     }
 
     protected override double GetGradientMagnitude(int i)
@@ -69,8 +69,6 @@ public class TwistConstraint : PBDAngularConstraint
 
         DoubleVector3 orientedB1 = body0oriented * b1;
         DoubleVector3 orientedB2 = body1oriented * b2;
-
-
 
 
         double angle = DoubleVector3.SignedAngleBetween(orientedB1, orientedB2, a1);

@@ -49,6 +49,7 @@ public class DistanceConstraint : PBDConstraint
         }
         firstBodyOffset = new DoubleVector3(firstBodyOffsetFloat);
         secondBodyOffset = new DoubleVector3(secondBodyOffsetFloat);
+        base.Init(allParticles);
     }
 
     protected override DoubleVector3 GetGradient(int bodyIndex)
@@ -85,7 +86,14 @@ public class DistanceConstraint : PBDConstraint
         if (!worldSpace2)
             realOffset2 = bodies[1].GetOrientation() * secondBodyOffset;
         DoubleVector3 distanceVec = (bodies[1].position + realOffset2) -  (bodies[0].position + realOffset1);
-        Debug.DrawLine((bodies[1].position + realOffset2).ToVector3(), (bodies[0].position + realOffset1).ToVector3());
+
+        Color color = Color.white;
+        if (breakForce > 0)
+        {
+            color = CalcColor();
+        }
+        Debug.DrawLine((bodies[1].position + realOffset2).ToVector3(), (bodies[0].position + realOffset1).ToVector3() , color, 0);
+
         bodyDirection = DoubleVector3.Normal(distanceVec);
 
         double distance = DoubleVector3.Magnitude(distanceVec);
@@ -131,5 +139,11 @@ public class DistanceConstraint : PBDConstraint
             return bodies[index].GetCorrectionOrientation(correction, sign, offset);
         }
         return new DoubleQuaternion(0, 0, 0, 0);
+    }
+
+    private Color CalcColor()
+    {
+        float percent = (float)(forceEstimate / breakForce);
+        return Color.Lerp(Color.white, Color.red, percent);
     }
 }

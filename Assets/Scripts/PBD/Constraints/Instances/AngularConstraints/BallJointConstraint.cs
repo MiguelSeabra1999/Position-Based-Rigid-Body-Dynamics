@@ -26,7 +26,6 @@ public class BallJointConstraint : PBDAngularConstraint
 
     public override void Init(Particle[] allParticles)
     {
-        base.Init(allParticles);
         bound *= Constants.Deg2Rad;
 
         a1 = DoubleVector3.Normal(new DoubleVector3(_a1));
@@ -37,6 +36,7 @@ public class BallJointConstraint : PBDAngularConstraint
 
         bodies.Add(body);
         bodies.Add(otherBody);
+        base.Init(allParticles);
     }
 
     protected override double GetGradientMagnitude(int i)

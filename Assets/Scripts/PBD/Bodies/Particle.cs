@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
+using System.Threading;
 public abstract class Particle : MonoBehaviour
 {
     public DoubleVector3 externalForce = new DoubleVector3(0);
@@ -25,6 +25,7 @@ public abstract class Particle : MonoBehaviour
     public DoubleVector3 up = new DoubleVector3(0, 1, 0);
     public DoubleVector3 right = new DoubleVector3(1, 0, 0);
     private DoubleVector3[] axes = new DoubleVector3[3];
+    [HideInInspector] public  Mutex mutex = new Mutex();
 
     /*     public double normalForceLargrangeMult;
      public bool appliedStaticFriction;*/
@@ -70,12 +71,12 @@ public abstract class Particle : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Handles.Label(transform.position, "v:" + DoubleVector3.Magnitude(velocity));
+        //  Handles.Label(transform.position, "v:" + DoubleVector3.Magnitude(velocity));
     }
 
     public virtual void PBDupdate()
     {
-        DrawLine();
+        // DrawLine();
     }
 
     public virtual void PBDphysicsUpdate()

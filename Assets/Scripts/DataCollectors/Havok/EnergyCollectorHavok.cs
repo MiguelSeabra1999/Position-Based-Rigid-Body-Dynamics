@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Unity.Physics.Authoring;
 using Unity.Mathematics;
 using Unity.Transforms;
-
+using System;
 
 public class EnergyCollectorHavok : MonoBehaviour
 {
@@ -20,6 +20,9 @@ public class EnergyCollectorHavok : MonoBehaviour
     private  List<double> potentialEnergyBuffer = new List<double>();
     private static EnergyCollectorHavok instance;
     private bool collided = false;
+
+    //private long prevTime = 0;
+
     void Awake()
     {
         instance = this;
@@ -78,6 +81,15 @@ public class EnergyCollectorHavok : MonoBehaviour
         instance.kineticEnergyBuffer.Add(kinetic);
         instance.potentialEnergyBuffer.Add(potential);
         instance.totalEnergyBuffer.Add(kinetic + potential);
+
+
+        /*   DateTimeOffset now = (DateTimeOffset)DateTime.UtcNow;  // using System;
+           long nowInMilliseconds = now.ToUnixTimeMilliseconds();
+
+           double realDeltaTime = 0.001 * (nowInMilliseconds - instance.prevTime);
+           instance.prevTime = nowInMilliseconds;
+
+           Debug.Log("real fps" + 1.0 / realDeltaTime);*/
     }
 
     private static double CalcKineticEnergy(float3 linear, float3 angular, float mass, float3 inverseInertiaTensor, Rotation rotation)

@@ -114,15 +114,11 @@ public class StaticFrictionConstraint : PBDConstraint
         }
     }
 
-/*
-    protected override void UpdateOrientation(DoubleVector3 correction, double sign , int index )
+    protected override void UpdateOrientation(DoubleVector3 correction, double sign , int index)
     {
-
         DoubleVector3 bodyOffset = GetBodyR(index);
         //Debug.Log(bodies[index].gameObject.name  + bodyOffset);
-        if(DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
-            bodies[index].ApplyCorrectionOrientation(correction,sign,bodyOffset);
-
+        if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
+            bodies[index].ApplyCorrectionOrientation(correction, -sign, bodyOffset);
     }
-    */
 }

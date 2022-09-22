@@ -451,4 +451,14 @@ public class CollisionEngine
             collisions[i].Separate();
         }
     }
+
+    public void IncreaseColCount()
+    {
+        BVH_node.maxColliders += 1;
+        foreach (BVH_node n in nodes)
+        {
+            n.colliders = new int[BVH_node.maxColliders];
+        }
+        checkedCols = new bool[allColliders.Length, allColliders.Length];
+    }
 }

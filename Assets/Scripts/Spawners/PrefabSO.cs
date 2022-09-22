@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EngineTypes
+{
+    PBD
+}
 
 [CreateAssetMenu(menuName = "PBRBD-Comparissons/PrefabSO")]
 public class PrefabSO : ScriptableObject

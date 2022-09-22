@@ -238,7 +238,7 @@ public  class PBDCollision
         DoubleVector3 frictionVelocity = velocityTangentNormal * Math.Min(Math.Abs(frictionForce), Math.Abs(velocityTangentMag));
 
         particle.ApplyRestitution(frictionVelocity, 1, particle.ProjectToWorldCoordinates(r));
-        Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(), frictionVelocity.ToVector3(), Color.cyan, 0.01f);
+        //    Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(), frictionVelocity.ToVector3(), Color.cyan, 0.01f);
 //        Debug.Log("dyn fric " + particle.name + " of "+ frictionVelocity);
     }
 
@@ -257,7 +257,7 @@ public  class PBDCollision
         velocityTangent = DoubleVector3.Magnitude(velocity) * -1 * DoubleVector3.Normal(velocityTangent);
 
         particle.ApplyRestitution(velocityTangent * h, 1, particle.ProjectToWorldCoordinates(r));
-        Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(),  velocityTangent.ToVector3(), Color.cyan, 0.01f);
+        //   Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(),  velocityTangent.ToVector3(), Color.cyan, 0.01f);
     }
 
     public override string ToString()

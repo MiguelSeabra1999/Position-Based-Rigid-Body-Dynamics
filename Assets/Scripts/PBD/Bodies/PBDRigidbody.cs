@@ -53,7 +53,7 @@ public class PBDRigidbody : Particle
         /*  pbdCollider.CalcBoundingBox();
           pbdCollider.aabb.DrawWireframe(Color.black);*/
 
-        Debug.DrawRay(transform.position, angularVelocity.ToVector3(), Color.blue, 0.1f);
+        //Debug.DrawRay(transform.position, angularVelocity.ToVector3(), Color.blue, 0.1f);
     }
 
     public override void UpdatePrevPosition()

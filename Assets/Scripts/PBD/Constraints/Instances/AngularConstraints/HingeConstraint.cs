@@ -25,7 +25,6 @@ public class HingeConstraint : PBDAngularConstraint
 
     public override void Init(Particle[] allParticles)
     {
-        base.Init(allParticles);
         a1 = DoubleVector3.Normal(new DoubleVector3(_a1));
         a2 = DoubleVector3.Normal(new DoubleVector3(_a2));
         rotAxis = DoubleVector3.Normal(new DoubleVector3(_rotAxis));
@@ -33,6 +32,7 @@ public class HingeConstraint : PBDAngularConstraint
 
         bodies.Add(body);
         bodies.Add(otherBody);
+        base.Init(allParticles);
     }
 
     protected override double GetGradientMagnitude(int i)

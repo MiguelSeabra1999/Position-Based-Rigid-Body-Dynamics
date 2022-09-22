@@ -23,6 +23,7 @@ public class VolumeConstraint : PBDConstraint
         bodies.Add(body3);
         if (goalVolume == 0)
             goalVolume = CalcVolume();
+        base.Init(allParticles);
     }
 
     protected override DoubleVector3 GetGradient(int bodyIndex)

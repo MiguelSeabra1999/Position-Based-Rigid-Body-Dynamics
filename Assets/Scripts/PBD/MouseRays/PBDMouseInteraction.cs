@@ -112,7 +112,7 @@ public class PBDMouseInteraction : MonoBehaviour
         ogColor = rend.material.color;
         rend.material.color = Random.ColorHSV();
 
-        constraintIndex = engine.constraints.Count;
+        constraintIndex = engine.constraints.Length;
         Debug.DrawLine(hit.point.ToVector3(), hit.collider.particle.position.ToVector3(), Color.cyan, 10);
         //Debug.DrawRay(hit.point.ToVector3(), Vector3.up*10, Color.blue, 10);
 

@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-
+using System.Threading;
 public  class PhysicsEngine : MonoBehaviour
 {
+    public bool parallel = true;
     public bool selfCollisions = true;
     public bool stepByStep = false;
     public bool optimizeCollisionDetection = true;
@@ -21,7 +22,7 @@ public  class PhysicsEngine : MonoBehaviour
     private  PBDMonoBehaviour[] monoBehaviours;
 
     public int substeps = 1;
-    public List<PBDConstraint> constraints = new List<PBDConstraint>();
+    public PBDConstraint[] constraints;
     public List<PBDConstraint> temporaryConstraints = new List<PBDConstraint>();
 
     public List<DistanceConstraint> distanceConstraints = new List<DistanceConstraint>();
@@ -38,6 +39,7 @@ public  class PhysicsEngine : MonoBehaviour
     protected  PBDCollision  col;*/
     // public double accuracy = 0.00001;
     private double prevTime = 0;
+    private Thread[] threads = new Thread[8];
 
 
     protected virtual void Start()
@@ -46,48 +48,61 @@ public  class PhysicsEngine : MonoBehaviour
         allParticles = GetComponentsInChildren<PBDParticle>();
         allRigidbodies = GetComponentsInChildren<PBDRigidbody>();
         monoBehaviours = GetComponentsInChildren<PBDMonoBehaviour>();
+
+        foreach (PBDMonoBehaviour m in monoBehaviours)
+        {
+            m.engine = this;
+        }
+
+
+        List<PBDConstraint> constraintsList = new List<PBDConstraint>();
+
         foreach (AlignAngleConstraint c in alignAngleConstraint)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
         foreach (BallJointConstraint c in ballJointConstraint)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
         foreach (HingeConstraint c in hingeConstraint)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
         foreach (TwistConstraint c in twistConstraint)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
         foreach (DistanceConstraint c in distanceConstraints)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
         foreach (VolumeConstraint c in volumeConstraint)
         {
-            constraints.Add(c);
+            constraintsList.Add(c);
         }
+        constraints = constraintsList.ToArray();
 
         StoreColliders();
 
         foreach (PBDConstraint c in constraints)
             c.Init(allBodies);
-
-        prevTime = Time.realtimeSinceStartupAsDouble;
+        //threads = new Thread[constraints.Length];
     }
 
     protected virtual void Update()
     {
-        double deltaTime = Time.realtimeSinceStartupAsDouble - prevTime;
+        double deltaTime;
+        if (prevTime == 0)
+            deltaTime = Time.deltaTime;
+        else
+            deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
+        prevTime = Time.realtimeSinceStartupAsDouble;
+        /*   Debug.Log("unity " + Time.deltaTime);
+           Debug.Log("mine " + deltaTime);
+           int fps = (int)(1.0 / deltaTime);
 
-        Debug.Log("unity " + Time.deltaTime);
-        Debug.Log("mine " + deltaTime);
-        int fps = (int)(1.0 / deltaTime);
-
-        Debug.Log("fps: " + fps);
+           Debug.Log("fps: " + fps);*/
         double h = deltaTime / substeps;
 
         if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep && selfCollisions)
@@ -95,7 +110,10 @@ public  class PhysicsEngine : MonoBehaviour
         for (int substep = 0; substep < substeps; substep++)
         {
             PositionalUpdate(h);
-            ConstraintSolve(h);
+            if (parallel)
+                ParallelConstraintSolve(h);
+            else
+                ConstraintSolve(h);
             RecalcVelocities(h);
             CollisionSolve(h);
             // RecalcVelocities(h);
@@ -106,8 +124,7 @@ public  class PhysicsEngine : MonoBehaviour
             collisionEngine.Clear();
         }
         UpdateActualPositions();
-        InvokeUpdate();
-        prevTime = Time.realtimeSinceStartupAsDouble;
+        InvokeUpdate(deltaTime);
     }
 
     private void InvokePhysicsUpdate(double h)
@@ -120,13 +137,13 @@ public  class PhysicsEngine : MonoBehaviour
         physicsSubstepEnd?.Invoke();
     }
 
-    private void InvokeUpdate()
+    private void InvokeUpdate(double deltaTime)
     {
         for (int i = 0; i < allBodies.Length; i++)
             allBodies[i].PBDupdate();
 
         for (int i = 0; i < monoBehaviours.Length; i++)
-            monoBehaviours[i].PBDUpdate();
+            monoBehaviours[i].PBDUpdate(deltaTime);
 
         if (stepByStep)
             Pause();
@@ -176,11 +193,48 @@ public  class PhysicsEngine : MonoBehaviour
             PBDConstraint constraint = temporaryConstraints[i];
             constraint.Solve(h);
         }
-        for (int i = 0; i < constraints.Count; i++)
+        int n = constraints.Length;
+        for (int i = 0; i < n; i++)
         {
             PBDConstraint constraint = constraints[i];
+            if (!constraint.broken)
+                constraint.Solve(h);
+        }
+    }
+
+    protected virtual void ParallelConstraintSolve(double h)
+    {
+        for (int i = 0; i < temporaryConstraints.Count; i++)
+        {
+            PBDConstraint constraint = temporaryConstraints[i];
             constraint.Solve(h);
         }
+
+        int n = constraints.Length;
+        int increment = n / threads.Length;
+        for(int i = 0; i < threads.Length-1; i++)
+        {
+            InitConstraintThread(i*increment, (i+1)*increment, i, h);
+        }
+        InitConstraintThread((threads.Length-1)*increment, threads.Length, threads.Length-1, h);
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            threads[i].Join();
+        }
+    }
+
+    protected void InitConstraintThread(int from, int to, int index, double h)
+    {
+        threads[index] = new Thread(() => 
+        {
+            for (int i = from; i < to; i++)
+            {
+                PBDConstraint constraint = constraints[i];
+                constraint.ParallelSolve(h);
+            }
+        }); threads[index].Start();
     }
 
     protected virtual void CollisionSolve(double h)
@@ -275,5 +329,40 @@ public  class PhysicsEngine : MonoBehaviour
     {
         UpdateActualPositions();
         Debug.Break();
+    }
+
+    public PBDRigidbody PBDInstantiate(GameObject obj, Vector3 p, Quaternion r)
+    {
+        GameObject newObj = Instantiate(obj, p, r, transform);
+        PBDRigidbody newBody = newObj.GetComponent<PBDRigidbody>();
+        PBDCollider newCol = newObj.GetComponent<PBDCollider>();
+
+        Particle[] allBodiesNew = new Particle[allBodies.Length + 1];
+        for (int i = 0; i < allBodies.Length; i++)
+        {
+            allBodiesNew[i] = allBodies[i];
+        }
+        allBodiesNew[allBodies.Length] = newBody;
+        allBodies = allBodiesNew;
+
+        PBDRigidbody[] allRBNew = new PBDRigidbody[allRigidbodies.Length + 1];
+        for (int i = 0; i < allRigidbodies.Length; i++)
+        {
+            allRBNew[i] = allRigidbodies[i];
+        }
+        allRBNew[allRigidbodies.Length] = newBody;
+        allRigidbodies = allRBNew;
+
+        PBDCollider[] allcolNew = new PBDCollider[collisionEngine.allColliders.Length + 1];
+        for (int i = 0; i < collisionEngine.allColliders.Length; i++)
+        {
+            allcolNew[i] = collisionEngine.allColliders[i];
+        }
+        allcolNew[collisionEngine.allColliders.Length] = newCol;
+        collisionEngine.allColliders = allcolNew;
+
+        collisionEngine.IncreaseColCount();
+
+        return newBody;
     }
 }

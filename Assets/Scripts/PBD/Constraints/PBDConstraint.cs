@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Threading;
 [Serializable]
 public abstract class PBDConstraint
 {
@@ -11,8 +11,12 @@ public abstract class PBDConstraint
     [HideInInspector] public double lagrangeMult;
 
     protected double accuracy = 0.00001f;
+    public double breakForce = 0;
+    [HideInInspector] public bool broken = false;
+    protected double forceEstimate = 0;
+    private Mutex[] mutexes;
 
-
+    // static private double maxForce = 0;
     /*
 
     protected Constraint(double _compliance)
@@ -20,13 +24,20 @@ public abstract class PBDConstraint
         compliance = _compliance;
     }
 */
-    public virtual void Init(Particle[] allParticles) {}
+    public virtual void Init(Particle[] allParticles)
+    {
+        mutexes = new Mutex[bodies.Count];
+        for (int i = 0; i < bodies.Count; i++)
+            mutexes[i] = bodies[i].mutex;
+    }
+
     protected abstract double GetGradientMagnitude(int i);
     public abstract double Evaluate();
     protected abstract DoubleVector3 GetGradient(int i);
     protected abstract double GetSign(int i);
 
     protected virtual bool LagrangeMultConstraint(double h) {return false;}
+
     protected virtual DoubleVector3 GetBodyR(int index)
     {
         return new DoubleVector3(0, 0, 0);
@@ -97,12 +108,33 @@ public abstract class PBDConstraint
 
     public virtual void Solve(double deltaTime)
     {
+        if (broken)
+            return;
         double error = Evaluate();
 
         if (error == 0)
             return;
 
         lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
+
+        if (breakForce > 0)
+        {
+            forceEstimate = Math.Abs(lagrangeMult) / (deltaTime);
+
+
+            /* Debug.Log(forceEstimate);
+             if (forceEstimate > maxForce)
+             {
+                 maxForce = forceEstimate;
+                 Debug.Log("max" + maxForce);
+             }*/
+            if (forceEstimate > breakForce)
+            {
+                //   Debug.Log("break " + forceEstimate);
+                broken = true;
+                return;
+            }
+        }
 
 
         if (LagrangeMultConstraint(deltaTime))
@@ -152,5 +184,15 @@ public abstract class PBDConstraint
     protected virtual DoubleQuaternion GetOrientationCorrection(DoubleVector3 correction, double sign, int index)
     {
         return new DoubleQuaternion(0, 0, 0, 0);
+    }
+
+    public void ParallelSolve(double h)
+    {
+        WaitHandle.WaitAll(mutexes);
+
+        Solve(h);
+
+        for (int i = 0; i < mutexes.Length; i++)
+            mutexes[i].ReleaseMutex();
     }
 }

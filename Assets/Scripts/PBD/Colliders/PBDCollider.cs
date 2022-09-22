@@ -267,7 +267,7 @@ public abstract class PBDCollider : MonoBehaviour
 
         //Debug.DrawLine(pointSelf.ToVector3(),pointOther.ToVector3());
 
-        DoubleVector3 closestPointOnBox = other.GetClosestPointOnSurface(pointSelf);
+        DoubleVector3 closestPointOnBox = other.GetClosestPoint(pointSelf);
         DoubleVector3 offset = closestPointOnBox - pointSelf;
         double magnitude = DoubleVector3.Magnitude(offset);
         if (magnitude > self.radius)
@@ -285,7 +285,7 @@ public abstract class PBDCollider : MonoBehaviour
 
     protected bool CheckCollision(PBDColliderSphere self, PBDColliderBox other,  PBDCollision collision)
     {
-        DoubleVector3 closestPointOnBox = other.GetClosestPointOnSurface(self.particle.position);
+        DoubleVector3 closestPointOnBox = other.GetClosestPoint(self.particle.position);
 
 
         DoubleVector3 offset = closestPointOnBox - self.particle.position;
