@@ -1,4 +1,4 @@
-/*using Unity.Entities;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Physics;
 using Unity.Physics.Systems;
@@ -34,8 +34,7 @@ public partial class EnergyCollectorHavokSystem : SystemBase
             .WithBurst()
             .ForEach((ref CollectEnergy collectEnergy, ref Translation t, ref Rotation r, ref PhysicsVelocity pv, ref PhysicsMass pm) =>
             {
-                //   Debug.Log("deltatime " + deltaTime);
-                //   EnergyCollectorHavok.SampleVelocity(t, r, pv.Linear, pv.Angular, 1 / pm.InverseMass, pm.InverseInertia);
+                EnergyCollectorHavok.SampleVelocity(t, r, pv.Linear, pv.Angular, pm.InverseMass, pm.InverseInertia);
             }).Schedule();
     }
 }
@@ -44,4 +43,3 @@ public struct CollectEnergy : IComponentData
 {
     public int id;
 }
-*/

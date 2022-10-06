@@ -7,16 +7,19 @@ public class EnergyCollectorPBD : DataCollector
     private List<DataPacket> totalEnergy = new List<DataPacket>();
     private List<DataPacket> kineticEnergy = new List<DataPacket>();
     private List<DataPacket> potentialEnergy = new List<DataPacket>();
-
+    private bool used = false;
     void OnDestroy()
     {
-        FileWritter.WriteToFile("PBD/Energy", "totalEnergy", totalEnergy);
-        FileWritter.WriteToFile("PBD/Energy", "kineticEnergy", kineticEnergy);
-        FileWritter.WriteToFile("PBD/Energy", "potentialEnergy", potentialEnergy);
+        if (!used)
+            return;
+        FileWritter.WriteToFile(subFolder + "/Energy", "totalEnergy", totalEnergy);
+        FileWritter.WriteToFile(subFolder + "/Energy", "kineticEnergy", kineticEnergy);
+        FileWritter.WriteToFile(subFolder + "/Energy", "potentialEnergy", potentialEnergy);
     }
 
     protected override void StepEnd()
     {
+        used = true;
         DataPacket dataKinetic = GetKineticEnergy();
         kineticEnergy.Add(dataKinetic);
         DataPacket dataPotential = GetPotentialEnergy();
@@ -45,6 +48,18 @@ public class EnergyCollectorPBD : DataCollector
         return new DataPacket(sum);
     }
 
+    public DataPacket GetTotalEnergy()
+    {
+        double sum = 0;
+        foreach (Particle p in engine.allBodies)
+        {
+            if (p.inverseMass != 0)
+                sum += p.CalcPotentialEnergy(PhysicsEngine.gravForce) + p.CalcKineticEnergy();
+        }
+        return new DataPacket(sum);
+    }
+
+/*
     private DataPacket GetLinearKineticEnergy()
     {
         double sum = 0;
@@ -60,8 +75,8 @@ public class EnergyCollectorPBD : DataCollector
         double sum = 0;
         foreach (Particle p in engine.allBodies)
         {
-            sum += p.CalcKineticEnergy();
+            sum += p.CalcAngularKineticEnergy();
         }
         return new DataPacket(sum);
-    }
+    }*/
 }

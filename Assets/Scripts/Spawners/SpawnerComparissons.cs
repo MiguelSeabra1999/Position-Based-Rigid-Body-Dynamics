@@ -15,8 +15,9 @@ public class SpawnerComparissons : MonoBehaviour
 
     private int count = 0;
     public PrefabSO prefabSO;
-    private GameObject pbd, havok, unity;
+    private GameObject pbd, havok, unity, jacobi;
     private PhysicsEngine pbdEngine;
+    private PhysicsEngineJacobi jacobiEngine;
 
     private List<GameObject> pbdLinks = new List<GameObject>();
 
@@ -27,7 +28,7 @@ public class SpawnerComparissons : MonoBehaviour
         ClearHierarchy();
         CreateScenes();
 
-        CreateWrekingBall();
+        SpawnRigidCradle();
     }
 
     [ContextMenu("CreateWrekingBall")]
@@ -47,6 +48,10 @@ public class SpawnerComparissons : MonoBehaviour
         pbd   = Instantiate(prefabSO.pbdScene);
         pbd.transform.SetParent(transform);
         pbdEngine = pbd.GetComponent<PhysicsEngine>();
+
+        jacobi   = Instantiate(prefabSO.pbdSceneJacobi);
+        jacobi.transform.SetParent(transform);
+        jacobiEngine = jacobi.GetComponent<PhysicsEngineJacobi>();
 
         havok = Instantiate(prefabSO.havokScene);
         havok.transform.SetParent(transform);
@@ -108,6 +113,7 @@ public class SpawnerComparissons : MonoBehaviour
     private void SpawnAllVersions(Vector3 pos, Quaternion rot)
     {
         SpawnInstance(prefabSO.pbdCube, pos, rot, pbd.transform);
+        SpawnInstance(prefabSO.pbdCube, pos, rot, jacobi.transform);
         SpawnInstance(prefabSO.havokCube, pos, rot, havok.transform);
         SpawnInstance(prefabSO.unityCube, pos, rot, unity.transform);
     }
@@ -115,50 +121,57 @@ public class SpawnerComparissons : MonoBehaviour
     private void SpawnAllVersionsCapsule(Vector3 pos, Quaternion rot)
     {
         SpawnInstance(prefabSO.pbdCapsule, pos, rot, pbd.transform);
+        SpawnInstance(prefabSO.pbdCapsule, pos, rot, jacobi.transform);
         SpawnInstance(prefabSO.havokCapsule, pos, rot, havok.transform);
         SpawnInstance(prefabSO.unityCapsule, pos, rot, unity.transform);
     }
 
-    private (GameObject, GameObject, GameObject)  SpawnAllVersionsSphere(Vector3 pos, Quaternion rot)
+    private (GameObject, GameObject,  GameObject, GameObject)  SpawnAllVersionsSphere(Vector3 pos, Quaternion rot)
     {
         GameObject obj = SpawnInstance(prefabSO.pbdSphere, pos, rot, pbd.transform);
+        GameObject objJacobi = SpawnInstance(prefabSO.pbdSphere, pos, rot, jacobi.transform);
         GameObject objHavok = SpawnInstance(prefabSO.havokSphere, pos, rot, havok.transform);
         GameObject objUnity = SpawnInstance(prefabSO.unitySphere, pos, rot, unity.transform);
-        return (obj, objHavok, objUnity);
+        return (obj, objJacobi, objHavok, objUnity);
     }
 
-    private (GameObject, GameObject, GameObject)  SpawnAllVersionsWrekingBall(Vector3 pos, Quaternion rot)
+    private (GameObject, GameObject, GameObject, GameObject)  SpawnAllVersionsWrekingBall(Vector3 pos, Quaternion rot)
     {
         GameObject obj = SpawnInstance(prefabSO.pbdWreckingBall, pos, rot, pbd.transform);
+        GameObject objJacobi = SpawnInstance(prefabSO.pbdWreckingBall, pos, rot, jacobi.transform);
         GameObject objHavok = SpawnInstance(prefabSO.havokWreckingBall, pos, rot, havok.transform);
         GameObject objUnity = SpawnInstance(prefabSO.unityWreckingBall, pos, rot, unity.transform);
-        return (obj, objHavok, objUnity);
+        return (obj, objJacobi, objHavok, objUnity);
     }
 
-    private (GameObject, GameObject, GameObject) SpawnAllVersionsCapsuleTrigger(Vector3 pos, Quaternion rot)
+    private (GameObject, GameObject, GameObject, GameObject) SpawnAllVersionsCapsuleTrigger(Vector3 pos, Quaternion rot)
     {
         GameObject obj = SpawnInstance(prefabSO.pbdCapsule, pos, rot, pbd.transform);
         MakeTriggerPBD(obj);
+        GameObject objJacobi = SpawnInstance(prefabSO.pbdCapsule, pos, rot, jacobi.transform);
+        MakeTriggerPBD(objJacobi);
 
         GameObject objHavok = SpawnInstance(prefabSO.havokCapsuleTrigger, pos, rot, havok.transform);
 
         GameObject objUnity = SpawnInstance(prefabSO.unityCapsule, pos, rot, unity.transform);
         MakeTriggerUnity(objUnity);
 
-        return (obj, objHavok, objUnity);
+        return (obj, objJacobi, objHavok, objUnity);
     }
 
-    private (GameObject, GameObject, GameObject) SpawnAllVersionsStaticSphere(Vector3 pos, Quaternion rot)
+    private (GameObject, GameObject, GameObject, GameObject) SpawnAllVersionsStaticSphere(Vector3 pos, Quaternion rot)
     {
         GameObject obj = SpawnInstance(prefabSO.pbdSphere, pos, rot, pbd.transform);
         MakeStaticPBD(obj);
+        GameObject jacobiObj = SpawnInstance(prefabSO.pbdSphere, pos, rot, jacobi.transform);
+        MakeStaticPBD(jacobiObj);
 
         GameObject objHavok = SpawnInstance(prefabSO.havokSphereStatic, pos, rot, havok.transform);
 
         GameObject objUnity = SpawnInstance(prefabSO.unitySphere, pos, rot, unity.transform);
         MakeStaticUnity(objUnity);
 
-        return (obj, objHavok, objUnity);
+        return (obj, jacobiObj, objHavok, objUnity);
     }
 
     private void MakeTriggerPBD(GameObject obj)
@@ -186,7 +199,7 @@ public class SpawnerComparissons : MonoBehaviour
         rb.isKinematic = true;
     }
 
-    private DistanceConstraint MakePBDConstraint(GameObject a, GameObject b)
+    private DistanceConstraint MakePBDConstraint(PhysicsEngine engine, GameObject a, GameObject b)
     {
         DistanceConstraint newConstraint = new DistanceConstraint();
         newConstraint.compliance = compliance;
@@ -195,7 +208,7 @@ public class SpawnerComparissons : MonoBehaviour
         newConstraint.otherBody = b.GetComponent<PBDRigidbody>();
         newConstraint.firstBodyOffsetFloat = new Vector3(0, -0.5f, 0);
         newConstraint.secondBodyOffsetFloat = new Vector3(0, 0.5f, 0);
-        pbdEngine.distanceConstraints.Add(newConstraint);
+        engine.distanceConstraints.Add(newConstraint);
 
         return newConstraint;
     }
@@ -227,50 +240,108 @@ public class SpawnerComparissons : MonoBehaviour
         return constraint;
     }
 
-    private void MakeFirstConstraint((GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject) b)
+    private void MakeFirstConstraint((GameObject, GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject, GameObject) b)
     {
-        DistanceConstraint pbdConstraint = MakePBDConstraint(a.Item1, b.Item1);
+        DistanceConstraint pbdConstraint = MakePBDConstraint(pbdEngine, a.Item1, b.Item1);
         pbdConstraint.firstBodyOffsetFloat = Vector3.zero;
-        BallAndSocketJoint havokConstraint = MakeHavokConstraint(a.Item2, b.Item2);
+        DistanceConstraint jacobiConstraint = MakePBDConstraint(jacobiEngine, a.Item2, b.Item2);
+        jacobiConstraint.firstBodyOffsetFloat = Vector3.zero;
+        BallAndSocketJoint havokConstraint = MakeHavokConstraint(a.Item3, b.Item3);
         havokConstraint.PositionLocal = Vector3.zero;
-        ConfigurableJoint unityConstraint = MakeUnityConstraint(a.Item3, b.Item3);
+        ConfigurableJoint unityConstraint = MakeUnityConstraint(a.Item4, b.Item4);
         unityConstraint.anchor = Vector3.zero;
     }
 
-    private void MakeLastConstraint((GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject) b)
+    private void MakeLastConstraint((GameObject, GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject, GameObject) b)
     {
-        DistanceConstraint pbdConstraint = MakePBDConstraint(a.Item1, b.Item1);
+        DistanceConstraint pbdConstraint = MakePBDConstraint(pbdEngine, a.Item1, b.Item1);
         pbdConstraint.secondBodyOffsetFloat = Vector3.zero;
-        BallAndSocketJoint havokConstraint = MakeHavokConstraint(a.Item2, b.Item2);
+        DistanceConstraint jacobiConstraint = MakePBDConstraint(jacobiEngine, a.Item2, b.Item2);
+        jacobiConstraint.secondBodyOffsetFloat = Vector3.zero;
+        BallAndSocketJoint havokConstraint = MakeHavokConstraint(a.Item3, b.Item3);
         havokConstraint.PositionInConnectedEntity = Vector3.zero;
-        ConfigurableJoint unityConstraint = MakeUnityConstraint(a.Item3, b.Item3);
+        ConfigurableJoint unityConstraint = MakeUnityConstraint(a.Item4, b.Item4);
         unityConstraint.connectedAnchor = Vector3.zero;
     }
 
-    private void MakeConstraint((GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject) b)
+    private void MakeConstraint((GameObject, GameObject, GameObject, GameObject) a, (GameObject, GameObject, GameObject, GameObject) b)
     {
-        MakePBDConstraint(a.Item1, b.Item1);
-        MakeHavokConstraint(a.Item2, b.Item2);
-        MakeUnityConstraint(a.Item3, b.Item3);
+        MakePBDConstraint(pbdEngine, a.Item1, b.Item1);
+        MakePBDConstraint(jacobiEngine, a.Item2, b.Item2);
+        MakeHavokConstraint(a.Item3, b.Item3);
+        MakeUnityConstraint(a.Item4, b.Item4);
     }
 
     [ContextMenu("SpawnRope")]
     private void SpawnRope()
     {
-        (GameObject, GameObject, GameObject)previousObjects;
-        (GameObject, GameObject, GameObject)objects;
-        objects = SpawnAllVersionsStaticSphere(startPos - Vector3.right * 0.5f , Quaternion.identity);
-        for (int i = 0; i < dims.x; i++)
+        SpawnRopeHorizontal(startPos, dims.x);
+    }
+
+    private void SpawnRopeHorizontal(Vector3 pos, int len)
+    {
+        (GameObject, GameObject, GameObject, GameObject)previousObjects;
+        (GameObject, GameObject, GameObject, GameObject)objects;
+        pos += Vector3.up * 0.5f;
+        objects = SpawnAllVersionsStaticSphere(pos , Quaternion.identity);
+        MakeTriggerPBD(objects.Item1);
+        MakeTriggerPBD(objects.Item2);
+        MakeTriggerUnity(objects.Item4);
+
+        pos += Vector3.right * 0.5f;
+        for (int i = 0; i < len; i++)
         {
             previousObjects = objects;
-            objects = SpawnAllVersionsCapsuleTrigger(startPos + Vector3.right * i, Quaternion.Euler(0, 0, 90));
+            objects = SpawnAllVersionsCapsuleTrigger(pos , Quaternion.Euler(0, 0, 90));
+            pos += Vector3.right;
             if (i == 0)
                 MakeFirstConstraint(previousObjects, objects);
             else
                 MakeConstraint(previousObjects, objects);
         }
 
-        (GameObject, GameObject, GameObject)spheres = SpawnAllVersionsWrekingBall(startPos + Vector3.right * (dims.x - 0.5f), Quaternion.identity);
+        (GameObject, GameObject, GameObject, GameObject)spheres = SpawnAllVersionsWrekingBall(pos - Vector3.right * 0.5f, Quaternion.identity);
+        MakeLastConstraint(objects, spheres);
+    }
+
+    [ContextMenu("SpawnRigidCradle")]
+    private void SpawnRigidCradle()
+    {
+        Vector3 pos = startPos;
+        for (int x = 0; x < dims.x - 1; x++)
+        {
+            pos += Vector3.right * spacing;
+            SpawnRopeVertical(pos);
+        }
+        pos += Vector3.right * spacing;
+        SpawnRopeHorizontal(pos, dims.y);
+    }
+
+    [ContextMenu("SpawnRopeVertical")]
+    private void SpawnRopeVertical()
+    {
+        SpawnRopeVertical(startPos);
+    }
+
+    private void SpawnRopeVertical(Vector3 pos)
+    {
+        (GameObject, GameObject, GameObject, GameObject)previousObjects;
+        (GameObject, GameObject, GameObject, GameObject)objects;
+        objects = SpawnAllVersionsStaticSphere(pos + Vector3.up * 0.5f , Quaternion.identity);
+        MakeTriggerPBD(objects.Item1);
+        MakeTriggerPBD(objects.Item2);
+        MakeTriggerUnity(objects.Item4);
+        for (int i = 0; i < dims.y; i++)
+        {
+            previousObjects = objects;
+            objects = SpawnAllVersionsCapsuleTrigger(pos + Vector3.down * i, Quaternion.Euler(0, 0, 0));
+            if (i == 0)
+                MakeFirstConstraint(previousObjects, objects);
+            else
+                MakeConstraint(previousObjects, objects);
+        }
+
+        (GameObject, GameObject, GameObject, GameObject)spheres = SpawnAllVersionsWrekingBall(pos + Vector3.down * (dims.y - 0.5f), Quaternion.identity);
         MakeLastConstraint(objects, spheres);
     }
 
@@ -315,7 +386,7 @@ public class SpawnerComparissons : MonoBehaviour
             basePoint += Vector3.left * (1 + spacing);
         }
 
-        (GameObject, GameObject, GameObject)objects = SpawnAllVersionsSphere(startPos + Vector3.right * 2, Quaternion.identity);
+        (GameObject, GameObject, GameObject, GameObject)objects = SpawnAllVersionsSphere(startPos + Vector3.right * 2, Quaternion.identity);
         objects.Item1.GetComponent<Particle>().startingVelocity = Vector3.left * 5;
         objects.Item3.GetComponent<Rigidbody>().velocity = Vector3.left * 5;
     }

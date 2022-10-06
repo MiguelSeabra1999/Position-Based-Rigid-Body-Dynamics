@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Threading;
+
+
 public  class PhysicsEngine : MonoBehaviour
 {
-    public bool parallel = true;
+    public bool parallelConstraintSolve = true;
+    public bool parallelCollisionSolve = true;
+    public bool parallelBroadCollisionSolve = true;
     public bool selfCollisions = true;
     public bool stepByStep = false;
     public bool optimizeCollisionDetection = true;
@@ -14,7 +17,7 @@ public  class PhysicsEngine : MonoBehaviour
 
     public bool storeTotalEnergy;
     public AnimationCurve totalEnergyPlot = new AnimationCurve();
-    protected bool instantSeperateContacts = false;
+
     public static double gravForce = 9.8;
     public  Particle[] allBodies;
     public  PBDParticle[] allParticles;
@@ -39,7 +42,9 @@ public  class PhysicsEngine : MonoBehaviour
     protected  PBDCollision  col;*/
     // public double accuracy = 0.00001;
     private double prevTime = 0;
-    private Thread[] threads = new Thread[8];
+
+    protected ThreadDispatcher threadDispatcher = new ThreadDispatcher();
+    public double deltaTime;
 
 
     protected virtual void Start()
@@ -90,7 +95,7 @@ public  class PhysicsEngine : MonoBehaviour
         //threads = new Thread[constraints.Length];
     }
 
-    protected virtual void Update()
+    private double CalcDeltaTime()
     {
         double deltaTime;
         if (prevTime == 0)
@@ -98,25 +103,42 @@ public  class PhysicsEngine : MonoBehaviour
         else
             deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
         prevTime = Time.realtimeSinceStartupAsDouble;
-        /*   Debug.Log("unity " + Time.deltaTime);
-           Debug.Log("mine " + deltaTime);
-           int fps = (int)(1.0 / deltaTime);
+        return deltaTime;
+    }
 
-           Debug.Log("fps: " + fps);*/
+    protected virtual void Update()
+    {
+        double prevDeltaTime = deltaTime;
+        deltaTime = CalcDeltaTime();
+        if (prevDeltaTime / deltaTime < 0.5f)
+            return;
+        //deltaTime = Time.deltaTime;
+
+
         double h = deltaTime / substeps;
 
         if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep && selfCollisions)
-            collisionEngine.BroadCollisionDetection();
+        {
+            if (parallelBroadCollisionSolve)
+                collisionEngine.ParallelBroadCollisionDetection(deltaTime);
+            else
+                collisionEngine.BroadCollisionDetection(deltaTime);
+        }
         for (int substep = 0; substep < substeps; substep++)
         {
             PositionalUpdate(h);
-            if (parallel)
+            if (parallelConstraintSolve)
                 ParallelConstraintSolve(h);
             else
                 ConstraintSolve(h);
+
             RecalcVelocities(h);
-            CollisionSolve(h);
-            // RecalcVelocities(h);
+
+            if (parallelCollisionSolve)
+                ParallelCollisionSolve(h);
+            else
+                CollisionSolve(h);
+
             VelocitySolve(h);//Collision Handling
 
 
@@ -155,6 +177,7 @@ public  class PhysicsEngine : MonoBehaviour
         collisionEngine.LoopCollisions(
             (c) => c.HandleCollision(h)
         );
+
         /* collisionEngine.LoopCollisions(
              (c) => c.HandleFriction(h)
          );*/
@@ -210,31 +233,16 @@ public  class PhysicsEngine : MonoBehaviour
             constraint.Solve(h);
         }
 
-        int n = constraints.Length;
-        int increment = n / threads.Length;
-        for(int i = 0; i < threads.Length-1; i++)
-        {
-            InitConstraintThread(i*increment, (i+1)*increment, i, h);
-        }
-        InitConstraintThread((threads.Length-1)*increment, threads.Length, threads.Length-1, h);
-
-
-        for (int i = 0; i < 4; i++)
-        {
-            threads[i].Join();
-        }
+        threadDispatcher.DistributeLoad((from, to, h, i) => {ConstraintThread(from, to, h, i);}, constraints.Length, h);
     }
 
-    protected void InitConstraintThread(int from, int to, int index, double h)
+    protected virtual void  ConstraintThread(int from, int to, double h, int index)
     {
-        threads[index] = new Thread(() => 
+        for (int i = from; i < to; i++)
         {
-            for (int i = from; i < to; i++)
-            {
-                PBDConstraint constraint = constraints[i];
-                constraint.ParallelSolve(h);
-            }
-        }); threads[index].Start();
+            PBDConstraint constraint = constraints[i];
+            constraint.ParallelSolve(h);
+        }
     }
 
     protected virtual void CollisionSolve(double h)
@@ -242,14 +250,19 @@ public  class PhysicsEngine : MonoBehaviour
         if (optimizeCollisionDetection)
         {
             if (!performBroadPhaseOncePerSimStep)
-                collisionEngine.BroadCollisionDetection();
-            collisionEngine.NarrowCollisionDetection(!instantSeperateContacts, h);
+                collisionEngine.BroadCollisionDetection(h);
+            collisionEngine.NarrowCollisionDetection(h);
         }
         else
         {
             collisionEngine.count = 0;
-            collisionEngine.FullCollisionDetection(collisionEngine.allColliders , h, !instantSeperateContacts);
+            collisionEngine.FullCollisionDetection(collisionEngine.allColliders, h);
         }
+    }
+
+    protected virtual void ParallelCollisionSolve(double h)
+    {
+        collisionEngine.ParallelNarrowCollisionDetection(h);
     }
 
     protected void UpdateActualPositions()

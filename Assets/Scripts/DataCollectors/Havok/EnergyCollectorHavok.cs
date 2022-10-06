@@ -11,6 +11,7 @@ using System;
 
 public class EnergyCollectorHavok : MonoBehaviour
 {
+    private static bool used = false;
     private  List<DataPacket> totalEnergy = new List<DataPacket>();
     private  List<DataPacket> kineticEnergy = new List<DataPacket>();
     private  List<DataPacket> potentialEnergy = new List<DataPacket>();
@@ -37,6 +38,8 @@ public class EnergyCollectorHavok : MonoBehaviour
 
     void OnDestroy()
     {
+        if (!used)
+            return;
         FileWritter.WriteToFile("Havok/Energy", "totalEnergy", totalEnergy);
         FileWritter.WriteToFile("Havok/Energy", "kineticEnergy", kineticEnergy);
         FileWritter.WriteToFile("Havok/Energy", "potentialEnergy", potentialEnergy);
@@ -74,8 +77,12 @@ public class EnergyCollectorHavok : MonoBehaviour
         instance.collided = true;
     }
 
-    public static void SampleVelocity(Translation pos, Rotation rot, float3 linear, float3 angular, float mass, float3 inverseInertia)
+    public static void SampleVelocity(Translation pos, Rotation rot, float3 linear, float3 angular, float inverseMass, float3 inverseInertia)
     {
+        used = true;
+        if (inverseMass == 0)
+            return;
+        float mass = 1 / inverseMass;
         double kinetic = (double)CalcKineticEnergy(linear, angular, mass, inverseInertia, rot);
         double potential = (double)CalcPotentialEnergy(pos.Value, mass);
         instance.kineticEnergyBuffer.Add(kinetic);

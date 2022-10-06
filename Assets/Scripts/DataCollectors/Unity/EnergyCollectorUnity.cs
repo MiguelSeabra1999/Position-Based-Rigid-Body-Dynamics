@@ -7,9 +7,12 @@ public class EnergyCollectorUnity : MonoBehaviour
     private List<DataPacket> totalEnergy = new List<DataPacket>();
     private List<DataPacket> kineticEnergy = new List<DataPacket>();
     private List<DataPacket> potentialEnergy = new List<DataPacket>();
+    private bool used = false;
 
     void OnDestroy()
     {
+        if (!used)
+            return;
         FileWritter.WriteToFile("Unity/Energy", "totalEnergy", totalEnergy);
         FileWritter.WriteToFile("Unity/Energy", "kineticEnergy", kineticEnergy);
         FileWritter.WriteToFile("Unity/Energy", "potentialEnergy", potentialEnergy);
@@ -17,6 +20,7 @@ public class EnergyCollectorUnity : MonoBehaviour
 
     void FixedUpdate()
     {
+        used = true;
         DataPacket data = GetTotalEnergy();
         totalEnergy.Add(data);
         data = GetKineticEnergy();
@@ -59,6 +63,11 @@ public class EnergyCollectorUnity : MonoBehaviour
         for (int i = 0; i < n; i++)
         {
             Rigidbody rb = transform.GetChild(i).GetComponent<Rigidbody>();
+            if (rb == null)
+                continue;
+            if (rb.isKinematic)
+                continue;
+
             if (rb != null)
                 sum += CalcKineticEnergy(rb);
         }

@@ -1,4 +1,4 @@
-/*using Unity.Entities;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Physics;
 using Unity.Physics.Systems;
@@ -69,4 +69,3 @@ public partial class CollisionCollectorHavokSystem : SystemBase
         }.Schedule(m_StepPhysicsWorldSystem.Simulation, Dependency);
     }
 }
-*/

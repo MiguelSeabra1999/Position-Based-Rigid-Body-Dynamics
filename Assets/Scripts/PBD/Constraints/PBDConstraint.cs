@@ -62,56 +62,15 @@ public abstract class PBDConstraint
 
     public virtual void GetContribution(double deltaTime, List<List<Correction>> corrections)
     {
-        double error = Evaluate();
-
-        if (error == 0)
-            return;
-
-        lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
-
-        if (LagrangeMultConstraint(deltaTime))
-            return;
-
-        for (int i = 0; i < bodies.Count; i++)
-        {
-            //Debug.DrawLine(bodies[i].position.ToVector3(), (bodies[i].position + correction).ToVector3(), Color.yellow);
-
-
-            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
-
-            if (bodies[i].inverseMass != 0)
-            {
-                double gradientMag = GetGradientMagnitude(i);
-                DoubleVector3 correction = GetGradient(i) * lagrangeMult *  (1 / bodies[i].mass);
-                DoubleVector3 positional = GetSign(i) * correction;
-                DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
-
-                //  Debug.Log("Attempting to add " + positional + " to body " + bodies[i].indexID);
-                corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
-            }
-
-
-            if (bodies[i].GetOrientation().IsNan())
-                Debug.Log("Nan found rotation" + bodies[i].gameObject);
-            if (bodies[i].position.IsNan())
-                Debug.Log("Nan found position" + bodies[i].gameObject);
-            if (bodies[i].position.IsInfinite())
-                Debug.Log("Infinite found position" + bodies[i].gameObject);
-            //bodies[i].prevPosition += correction;
-        }
-
-
-        /*    double newError = Evaluate();
-             if(newError != 0)
-                 Debug.Log("error " + newError);*/
-    }
-
-    public virtual void Solve(double deltaTime)
-    {
+        /*   Solve(deltaTime, (i, correction, lagrangeMult) =>
+           {
+               DoubleVector3 positional = GetSign(i) * correction;
+               DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
+               corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+           });*/
         if (broken)
             return;
         double error = Evaluate();
-
         if (error == 0)
             return;
 
@@ -120,60 +79,179 @@ public abstract class PBDConstraint
         if (breakForce > 0)
         {
             forceEstimate = Math.Abs(lagrangeMult) / (deltaTime);
-
-
-            /* Debug.Log(forceEstimate);
-             if (forceEstimate > maxForce)
-             {
-                 maxForce = forceEstimate;
-                 Debug.Log("max" + maxForce);
-             }*/
             if (forceEstimate > breakForce)
             {
-                //   Debug.Log("break " + forceEstimate);
                 broken = true;
                 return;
             }
         }
-
 
         if (LagrangeMultConstraint(deltaTime))
             return;
 
         for (int i = 0; i < bodies.Count; i++)
         {
-            //Debug.DrawLine(bodies[i].position.ToVector3(), (bodies[i].position + correction).ToVector3(), Color.yellow);
-
-
             double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
 
             if (bodies[i].inverseMass != 0)
             {
                 double gradientMag = GetGradientMagnitude(i);
                 DoubleVector3 correction = GetGradient(i) * gradientMag *   lagrangeMult *  (1 / bodies[i].mass);
+
+                DoubleVector3 positional = GetSign(i) * correction;
+                DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
+                corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+
+                //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
+            }
+
+            bodies[i].Validate();
+        }
+    }
+
+    public virtual void ParallelGetContribution(double deltaTime, List<List<Correction>> corrections)
+    {
+        /* Solve(deltaTime, (i, correction, lagrangeMult) =>
+         {
+             DoubleVector3 positional = GetSign(i) * correction;
+             DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
+             lock (corrections)
+             {
+                 corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+             }
+         });*/
+
+        if (broken)
+            return;
+        double error = Evaluate();
+        if (error == 0)
+            return;
+
+        lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
+
+        if (breakForce > 0)
+        {
+            forceEstimate = Math.Abs(lagrangeMult) / (deltaTime);
+            if (forceEstimate > breakForce)
+            {
+                broken = true;
+                return;
+            }
+        }
+
+        if (LagrangeMultConstraint(deltaTime))
+            return;
+
+        for (int i = 0; i < bodies.Count; i++)
+        {
+            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
+
+            if (bodies[i].inverseMass != 0)
+            {
+                double gradientMag = GetGradientMagnitude(i);
+                DoubleVector3 correction = GetGradient(i) * gradientMag *   lagrangeMult *  (1 / bodies[i].mass);
+
+                DoubleVector3 positional = GetSign(i) * correction;
+                DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
+                lock (corrections)
+                {
+                    corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+                }
+
+                //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
+            }
+
+            bodies[i].Validate();
+        }
+    }
+
+    public virtual void Solve(double deltaTime)
+    {
+        /* Solve(deltaTime, (i, correction, lagrangeMult) =>
+         {
+             bodies[i].position += GetSign(i) * correction;
+             UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
+         });*/
+
+        if (broken)
+            return;
+        double error = Evaluate();
+        if (error == 0)
+            return;
+
+        lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
+
+        if (breakForce > 0)
+        {
+            forceEstimate = Math.Abs(lagrangeMult) / (deltaTime);
+            if (forceEstimate > breakForce)
+            {
+                broken = true;
+                return;
+            }
+        }
+
+        if (LagrangeMultConstraint(deltaTime))
+            return;
+
+        for (int i = 0; i < bodies.Count; i++)
+        {
+            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
+
+            if (bodies[i].inverseMass != 0)
+            {
+                double gradientMag = GetGradientMagnitude(i);
+                DoubleVector3 correction = GetGradient(i) * gradientMag *   lagrangeMult *  (1 / bodies[i].mass);
+
                 bodies[i].position += GetSign(i) * correction;
                 UpdateOrientation(GetGradient(i) * lagrangeMult , GetSign(i), i);
 
                 //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
             }
 
+            bodies[i].Validate();
+        }
+    }
 
-            if (bodies[i].GetOrientation().IsNan())
-                Debug.Log("Nan found rotation" + bodies[i].gameObject);
-            if (bodies[i].position.IsNan())
-                Debug.Log("Nan found position" + bodies[i].gameObject);
-            if (bodies[i].position.IsInfinite())
+    public  void Solve(double deltaTime, Action<int, DoubleVector3, double> updateFunc)
+    {
+        if (broken)
+            return;
+        double error = Evaluate();
+        if (error == 0)
+            return;
+
+        lagrangeMult = GetLagrangeMultiplier(error, deltaTime);
+
+        if (breakForce > 0)
+        {
+            forceEstimate = Math.Abs(lagrangeMult) / (deltaTime);
+            if (forceEstimate > breakForce)
             {
-                Debug.Log("Infinite found position" + bodies[i].gameObject);
-                Debug.Break();
+                broken = true;
+                return;
             }
-            //bodies[i].prevPosition += correction;
         }
 
+        if (LagrangeMultConstraint(deltaTime))
+            return;
 
-        /*  double newError = Evaluate();
-          if (newError != 0)
-              Debug.Log("error " + newError);*/
+        for (int i = 0; i < bodies.Count; i++)
+        {
+            double wi = bodies[i].GetGeneralizedInverseMass(GetGradient(i), GetBodyR(i));
+
+            if (bodies[i].inverseMass != 0)
+            {
+                double gradientMag = GetGradientMagnitude(i);
+                DoubleVector3 correction = GetGradient(i) * gradientMag *   lagrangeMult *  (1 / bodies[i].mass);
+
+                updateFunc(i, correction, lagrangeMult);
+
+                //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
+            }
+
+            bodies[i].Validate();
+        }
     }
 
     protected virtual void UpdateOrientation(DoubleVector3 correction, double sign, int index)
@@ -191,6 +269,16 @@ public abstract class PBDConstraint
         WaitHandle.WaitAll(mutexes);
 
         Solve(h);
+
+        for (int i = 0; i < mutexes.Length; i++)
+            mutexes[i].ReleaseMutex();
+    }
+
+    public void ParallelSolve(double h, List<List<Correction>> corrections)
+    {
+        WaitHandle.WaitAll(mutexes);
+
+        ParallelGetContribution(h, corrections);
 
         for (int i = 0; i < mutexes.Length; i++)
             mutexes[i].ReleaseMutex();

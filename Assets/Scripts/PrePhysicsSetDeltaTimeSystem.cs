@@ -1,4 +1,4 @@
-/*using System.Diagnostics;
+using System.Diagnostics;
 using Unity.Entities;
 using Unity.Physics.Systems;
 using UnityEngine;
@@ -27,7 +27,6 @@ public class PrePhysicsSetDeltaTimeSystem : ComponentSystem
 
 
         UnityEngine.Time.fixedDeltaTime = (float)realDeltaTime * timeScale;
-
     }
 }
 
@@ -46,4 +45,3 @@ public class PostPhysicsResetDeltaTimeSystem : ComponentSystem
         UnityEngine.Time.fixedDeltaTime = preSystem.previousDeltaTime;
     }
 }
-*/

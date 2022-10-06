@@ -25,6 +25,31 @@ public abstract class PBDAngularConstraint : PBDConstraint
 
     public override void Solve(double deltaTime)
     {
+        Solve(deltaTime, (i , correctionQ, lagrangeMult) =>
+        {
+            bodies[i].SetRotation(bodies[i].GetOrientation() + GetSign(i) * correctionQ);
+        });
+    }
+
+    public override void GetContribution(double deltaTime, List<List<Correction>> corrections)
+    {
+        Solve(deltaTime, (i, correctionQ, lagrangeMult) =>
+        {
+            corrections[bodies[i].indexID].Add(new Correction(new DoubleVector3(0), GetSign(i) * correctionQ));
+        });
+    }
+
+    public override void ParallelGetContribution(double deltaTime, List<List<Correction>> corrections)
+    {
+        Solve(deltaTime, (i, correctionQ, lagrangeMult) =>
+        {
+            lock (corrections)
+                corrections[bodies[i].indexID].Add(new Correction(new DoubleVector3(0), GetSign(i) * correctionQ));
+        });
+    }
+
+    public  void Solve(double deltaTime, Action<int, DoubleQuaternion, double> updateFunc)
+    {
         double error = Evaluate();
 
         if (error == 0)
@@ -45,8 +70,7 @@ public abstract class PBDAngularConstraint : PBDConstraint
             DoubleVector3 correction = bodies[i].GetOrientation() * (bodies[i].GetInertiaTensorInverted() * p);
             //DoubleVector3 correction = GetGradient(i) * bodies[i].GetGeneralizedInverseMass(GetGradient(i));
             DoubleQuaternion correctionQ = 0.5 * new DoubleQuaternion(0, correction.x, correction.y, correction.z) * bodies[i].GetOrientation();
-
-            bodies[i].SetRotation(bodies[i].GetOrientation() + GetSign(i) * correctionQ);
+            updateFunc(i, correctionQ, lagrangeMult);
         }
     }
 

@@ -6,7 +6,6 @@ public class PhysicsEngineJacobi : PhysicsEngine
 {
     private List<List<Correction>> corrections = new List<List<Correction>>();
 
-
     protected override void Start()
     {
         base.Start();
@@ -33,19 +32,48 @@ public class PhysicsEngineJacobi : PhysicsEngine
         ClearCorrections();
     }
 
+    protected override void ParallelConstraintSolve(double h)
+    {
+        for (int i = 0; i < temporaryConstraints.Count; i++)
+        {
+            PBDConstraint constraint = temporaryConstraints[i];
+            constraint.Solve(h);
+        }
+
+        threadDispatcher.DistributeLoad((from, to, h, i) => {ConstraintThread(from, to, h, i);}, constraints.Length, h);
+        ApplyCorrections();
+        ClearCorrections();
+    }
+
+    protected override void  ConstraintThread(int from, int to, double h, int index)
+    {
+        for (int i = from; i < to; i++)
+        {
+            PBDConstraint constraint = constraints[i];
+            constraint.ParallelSolve(h, corrections);
+        }
+    }
+
     protected override void CollisionSolve(double h)
     {
         if (optimizeCollisionDetection)
         {
             if (!performBroadPhaseOncePerSimStep)
-                collisionEngine.BroadCollisionDetection();
-            collisionEngine.NarrowCollisionDetection(!instantSeperateContacts, h, corrections);
+                collisionEngine.BroadCollisionDetection(h);
+            collisionEngine.NarrowCollisionDetection(h, corrections);
         }
         else
         {
             collisionEngine.count = 0;
-            collisionEngine.FullCollisionDetection(collisionEngine.allColliders , h, !instantSeperateContacts, corrections);
+            collisionEngine.FullCollisionDetection(collisionEngine.allColliders , h, corrections);
         }
+        ApplyCorrections();
+        ClearCorrections();
+    }
+
+    protected override void ParallelCollisionSolve(double h)
+    {
+        collisionEngine.ParallelNarrowCollisionDetection(h, corrections);
         ApplyCorrections();
         ClearCorrections();
     }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3971845552805209109}
   - component: {fileID: 3971845552805209108}
   - component: {fileID: -2010684322034216939}
+  - component: {fileID: 1497182420799482835}
   m_Layer: 0
   m_Name: SceneJacobi
   m_TagString: Untagged
@@ -64,7 +65,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4656f85c87914664c9e2ebb3c5e9c13f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subFolder: 
+  subFolder: Jacobi
 --- !u!114 &3971845552805209108
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af2695f2b8d75342bc89ffedf999eaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subFolder: 
+  subFolder: Jacobi
 --- !u!114 &-2010684322034216939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,6 +91,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 759de241d2e75a14da15c33ec06509c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parallelConstraintSolve: 1
+  parallelCollisionSolve: 1
+  parallelBroadCollisionSolve: 1
+  selfCollisions: 1
   stepByStep: 0
   optimizeCollisionDetection: 1
   performBroadPhaseOncePerSimStep: 1
@@ -108,6 +113,21 @@ MonoBehaviour:
   ballJointConstraint: []
   twistConstraint: []
   hingeConstraint: []
+  alignAngleConstraint: []
+  volumeConstraint: []
+  deltaTime: 0
+--- !u!114 &1497182420799482835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3971845552805209129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d0e628aaff374d42ad3a7cd77834f33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3971845552606476375
 PrefabInstance:
   m_ObjectHideFlags: 0

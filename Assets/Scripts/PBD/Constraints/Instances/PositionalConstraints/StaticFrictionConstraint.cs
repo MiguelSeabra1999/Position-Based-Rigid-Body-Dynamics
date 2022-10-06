@@ -71,6 +71,13 @@ public class StaticFrictionConstraint : PBDConstraint
              Debug.Log("applying");
              Debug.Log("error " + error);
          }*/
+        if (error == 0)
+        {
+            col.hasStaticFriction = false;
+            col.hasDynamicFriction = false;
+            col.hasFriction = false;
+        }
+
         return error;
     }
 
@@ -80,11 +87,8 @@ public class StaticFrictionConstraint : PBDConstraint
 
         frictionCol.tangencialDir = gradient;
 
-        if (!col.hasStaticFriction)
-            return true;
 
-
-        if (Math.Abs(normalConstraint.lagrangeMult) * staticFrictionCoefficient <= Math.Abs(lagrangeMult))
+        if (!col.hasStaticFriction || Math.Abs(normalConstraint.lagrangeMult) * staticFrictionCoefficient <= Math.Abs(lagrangeMult))
         {
             frictionCol.normalForceLargrangeMult = Math.Abs(normalConstraint.lagrangeMult);
 
@@ -114,11 +118,11 @@ public class StaticFrictionConstraint : PBDConstraint
         }
     }
 
-    protected override void UpdateOrientation(DoubleVector3 correction, double sign , int index)
-    {
-        DoubleVector3 bodyOffset = GetBodyR(index);
-        //Debug.Log(bodies[index].gameObject.name  + bodyOffset);
-        if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
-            bodies[index].ApplyCorrectionOrientation(correction, -sign, bodyOffset);
-    }
+    /*   protected override void UpdateOrientation(DoubleVector3 correction, double sign , int index)
+       {
+           DoubleVector3 bodyOffset = GetBodyR(index);
+           //Debug.Log(bodies[index].gameObject.name  + bodyOffset);
+           if (DoubleVector3.MagnitudeSqr(bodyOffset) > 0)
+               bodies[index].ApplyCorrectionOrientation(correction, -sign, bodyOffset);
+       }*/
 }

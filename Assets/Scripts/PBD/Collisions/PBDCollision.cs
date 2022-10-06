@@ -113,7 +113,10 @@ public  class PBDCollision
 
     private void InitCollision()
     {
-        frictionCol = PBDFrictionCollision.GetNewFrictionCollision();
+        lock (PBDFrictionCollision.allFrictionCollisions)
+        {
+            frictionCol = PBDFrictionCollision.GetNewFrictionCollision();
+        }
 
         hasStaticFriction = a.staticFrictionCoefficient != 0 && b.staticFrictionCoefficient != 0;
         hasDynamicFriction = a.dynamicFrictionCoefficient != 0 && b.dynamicFrictionCoefficient != 0;
@@ -209,16 +212,20 @@ public  class PBDCollision
     {
         if (!fricCol.appliedStaticFriction)
         {
-//                Debug.Log("dynamic");
             if (hasDynamicFriction)
+            {
+//                Debug.Log("dynamic");
                 ApplyDynamicFriction(particle, r, fricCol, sign, h);
+            }
         }
         /**/
         else
         {
-            //   Debug.Log("static");
-            /*     if (hasStaticFriction)
-                     ApplyStaticFriction(particle, fricCol, r, h, sign);*/
+            /*    if (hasStaticFriction)
+                {
+                    Debug.Log("static");
+                    ApplyStaticFriction(particle, fricCol, r, h, sign);
+                }*/
         }
     }
 
@@ -227,7 +234,7 @@ public  class PBDCollision
         double dynamicFrictionCoeffiecient = (a.dynamicFrictionCoefficient + b.dynamicFrictionCoefficient) / 2.0;
         if (dynamicFrictionCoeffiecient == 0)
             return;
-        double frictionForce = dynamicFrictionCoeffiecient * fricCol.normalForceLargrangeMult / h;
+        double frictionForce = dynamicFrictionCoeffiecient * (fricCol.normalForceLargrangeMult / (h));
         DoubleVector3 velocityTangentNormal = sign * DoubleVector3.Normal(fricCol.tangencialDir);
         DoubleVector3 velocity = particle.GetVelocityAtCollisionPoint(r);
         if (DoubleVector3.MagnitudeSqr(velocity) == 0)
@@ -244,20 +251,18 @@ public  class PBDCollision
 
     private void ApplyStaticFriction(Particle particle, PBDFrictionCollision fricCol, DoubleVector3 r, double h, double sign)
     {
-        if (DoubleVector3.Magnitude(particle.velocity) == 0)
-            return;
-
+        //Debug.Log("Angular velocity " + ((PBDRigidbody)particle).angularVelocity);
 
         DoubleVector3 velocityTangentNormal = sign * DoubleVector3.Normal(fricCol.tangencialDir);
-        DoubleVector3 velocity = particle.GetVelocityAtCollisionPoint(r);
+        DoubleVector3 velocity = particle.velocity; //particle.GetVelocityAtCollisionPoint(r);
+        Debug.Log("velocityMag " + DoubleVector3.Magnitude(velocity));
         // Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(), velocityTangentNormal.ToVector3(), Color.red, 0.01f);
 
-        DoubleVector3 velocityTangent = velocityTangentNormal * DoubleVector3.Dot(velocity, velocityTangentNormal);
+        DoubleVector3 velocityTangent = -1 * velocityTangentNormal * DoubleVector3.Dot(velocity, velocityTangentNormal);
+        Debug.Log("before" + DoubleVector3.Magnitude(velocityTangent));
 
-        velocityTangent = DoubleVector3.Magnitude(velocity) * -1 * DoubleVector3.Normal(velocityTangent);
-
-        particle.ApplyRestitution(velocityTangent * h, 1, particle.ProjectToWorldCoordinates(r));
-        //   Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(),  velocityTangent.ToVector3(), Color.cyan, 0.01f);
+        particle.ApplyRestitution(velocityTangent  , 1, particle.ProjectToWorldCoordinates(r));
+        //Debug.DrawRay(particle.position.ToVector3() + (particle.GetOrientation() * r).ToVector3(),  velocityTangent.ToVector3(), Color.cyan, 0.01f);
     }
 
     public override string ToString()

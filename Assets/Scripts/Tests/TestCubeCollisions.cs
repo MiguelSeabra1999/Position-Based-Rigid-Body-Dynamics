@@ -11,6 +11,8 @@ public class TestCubeCollisions : MonoBehaviour
     private List<Renderer> rends = new List<Renderer>();
     private PBDCollision col;
     private CollisionEngine collisionEngine = new CollisionEngine();
+    private NonPenetrationConstraint nonPenetrationConstraint = new NonPenetrationConstraint();
+    private StaticFrictionConstraint staticFrictionConstraint = new StaticFrictionConstraint();
     // Start is called before the first frame update
     void Awake()
     {
@@ -74,7 +76,7 @@ public class TestCubeCollisions : MonoBehaviour
     [ContextMenu("Seperate")]
     private void Seperate()//Deprecated
     {
-        collisionEngine.CreateConstraints(0.0001, col);
+        collisionEngine.CreateConstraints(0.0001, col, nonPenetrationConstraint, staticFrictionConstraint);
         col.a.transform.position = col.a.position.ToVector3();
         col.b.transform.position = col.b.position.ToVector3();
     }

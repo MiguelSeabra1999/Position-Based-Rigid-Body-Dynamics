@@ -15,14 +15,18 @@ public abstract class DataCollector : MonoBehaviour
 
     void OnEnable()
     {
+        if (engine == null)
+            return;
         engine.physicsStepEnd += StepEnd;
         engine.physicsSubstepEnd += SubstepEnd;
     }
 
     void OnDisable()
     {
-        engine.physicsStepEnd += StepEnd;
-        engine.physicsSubstepEnd += SubstepEnd;
+        if (engine == null)
+            return;
+        engine.physicsStepEnd -= StepEnd;
+        engine.physicsSubstepEnd -= SubstepEnd;
     }
 
     protected virtual void StepEnd() {}

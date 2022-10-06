@@ -239,4 +239,27 @@ public abstract class Particle : MonoBehaviour
     {
         Debug.DrawLine(transform.position, transform.position + (velocity).ToVector3() , GetComponent<Renderer>().material.color);
     }
+
+    public bool Validate()
+    {
+        bool result = false;
+        if (GetOrientation().IsNan())
+        {
+            Debug.Log("Nan found rotation" + gameObject);
+            result = true;
+        }
+        if (position.IsNan())
+        {
+            Debug.Log("Nan found position" + gameObject);
+            result = true;
+        }
+        if (position.IsInfinite())
+        {
+            Debug.Log("Infinite found position" + gameObject);
+            result = true;
+        }
+        if (result)
+            Debug.Break();
+        return result;
+    }
 }
