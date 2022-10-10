@@ -26,11 +26,13 @@ public class CollisionEngine
     private  PBDCollision  col = new PBDCollision();
     public int count = 0;
     public int colCount = 0;
-    bool[,] checkedCols;
+    public bool[,] checkedCols;
 
 
     public List<(int, int)> collisionPairs = new List<(int, int)>();
     ThreadDispatcher threadDispatcher = new ThreadDispatcher();
+    CollisionThread collisionThreadDispatcher;
+    ExcludedCollisionThread excludedCollisionThreadDispatcher;
     private Mutex colListMutex = new Mutex();
 
     private  PBDCollision[]  cols = new PBDCollision[ThreadDispatcher.NTHREADS];
@@ -41,6 +43,8 @@ public class CollisionEngine
 
     public CollisionEngine()
     {
+        collisionThreadDispatcher = new CollisionThread(this);
+        excludedCollisionThreadDispatcher = new ExcludedCollisionThread(this);
         for (int i = 0; i < cols.Length; i++)
         {
             cols[i] = new PBDCollision();
@@ -264,12 +268,25 @@ public class CollisionEngine
     {
         Action<PBDCollider, PBDCollider, int> collisionFunc = (iCol, jCol, index) => {ParallelCheckCollision(iCol, jCol,  h, index, corrections);};
         ParallelNarrowCollisionDetection(h, collisionFunc);
+
+        /*  if (allColliders.Length == 0)
+              return;
+          if (selfCollisions && collisionPairs.Count > 0)
+              collisionThreadDispatcher.DistributeLoad(collisionPairs.Count, h, corrections);
+
+          excludedCollisionThreadDispatcher.DistributeLoad(allColliders.Length, h, corrections);*/
     }
 
     public void ParallelNarrowCollisionDetection(double h)
     {
         Action<PBDCollider, PBDCollider, int> collisionFunc = (iCol, jCol, index) => {ParallelCheckCollision(iCol, jCol,  h, index);};
         ParallelNarrowCollisionDetection(h, collisionFunc);
+        /*     if (allColliders.Length == 0)
+                 return;
+             if (selfCollisions && collisionPairs.Count > 0)
+                 collisionThreadDispatcher.DistributeLoad(collisionPairs.Count, h);
+
+             excludedCollisionThreadDispatcher.DistributeLoad(allColliders.Length, h);*/
     }
 
     public void ParallelNarrowCollisionDetection(double h, Action<PBDCollider, PBDCollider, int> collisionFunc)
@@ -483,7 +500,7 @@ public class CollisionEngine
         }
     }
 
-    private void ParallelCheckCollision(PBDCollider a, PBDCollider b, double h, int index)
+    public void ParallelCheckCollision(PBDCollider a, PBDCollider b, double h, int index)
     {
         bool collided = a.CheckCollision(b,  cols[index]);
         if (collided)
@@ -494,7 +511,7 @@ public class CollisionEngine
         }
     }
 
-    private void ParallelCheckCollision(PBDCollider a, PBDCollider b, double h, int index, List<List<Correction>> corrections)
+    public void ParallelCheckCollision(PBDCollider a, PBDCollider b, double h, int index, List<List<Correction>> corrections)
     {
         bool collided = a.CheckCollision(b,  cols[index]);
         if (collided)
@@ -529,7 +546,7 @@ public class CollisionEngine
             CheckCollision(iCol, jCol,  h, correction);
     }
 
-    private bool IsAlreadyChecked(int i, int j)
+    public bool IsAlreadyChecked(int i, int j)
     {
         int minInd = Mathf.Min(i, j);
         int maxInd = Mathf.Max(i, j);

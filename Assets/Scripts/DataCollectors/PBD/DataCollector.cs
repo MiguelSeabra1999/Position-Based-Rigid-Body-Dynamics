@@ -8,9 +8,12 @@ public abstract class DataCollector : MonoBehaviour
 
     public string subFolder;
 
-    void Awake()
+    protected virtual void Awake()
     {
         engine = GetComponent<PhysicsEngine>();
+        if (engine == null)
+            if (transform.parent != null)
+                engine = transform.parent.GetComponent<PhysicsEngine>();
     }
 
     void OnEnable()

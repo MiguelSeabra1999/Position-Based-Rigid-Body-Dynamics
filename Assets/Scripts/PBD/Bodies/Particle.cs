@@ -39,6 +39,11 @@ public abstract class Particle : MonoBehaviour
         return GetOrientation();
     }
 
+    public virtual double CalcRotationalKineticEnergy()
+    {
+        return 0;
+    }
+
     public virtual DoubleVector3 GetVelocityAtCollisionPoint(DoubleVector3 r)
     {
         return velocity;

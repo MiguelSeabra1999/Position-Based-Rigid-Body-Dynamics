@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2955907569638550516}
   - component: {fileID: 7954273458310366534}
+  - component: {fileID: 6015706984606115902}
   m_Layer: 0
   m_Name: HavokScene
   m_TagString: Untagged
@@ -44,6 +45,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c3fb4a3b3fed084a91489275419d4be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6015706984606115902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955907569638550515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 009d3c539e8f5c94091e21122856b8d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2955907571051523178

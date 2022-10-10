@@ -7,6 +7,7 @@ using UnityEngine.Events;
 
 public  class PhysicsEngine : MonoBehaviour
 {
+    public bool skipFPSspikes = false;
     public bool parallelConstraintSolve = true;
     public bool parallelCollisionSolve = true;
     public bool parallelBroadCollisionSolve = true;
@@ -18,7 +19,7 @@ public  class PhysicsEngine : MonoBehaviour
     public bool storeTotalEnergy;
     public AnimationCurve totalEnergyPlot = new AnimationCurve();
 
-    public static double gravForce = 9.8;
+    public static double gravForce = 9.81;
     public  Particle[] allBodies;
     public  PBDParticle[] allParticles;
     public  PBDRigidbody[] allRigidbodies;
@@ -93,15 +94,14 @@ public  class PhysicsEngine : MonoBehaviour
         foreach (PBDConstraint c in constraints)
             c.Init(allBodies);
         //threads = new Thread[constraints.Length];
+        prevTime = Time.realtimeSinceStartupAsDouble;
     }
 
     private double CalcDeltaTime()
     {
         double deltaTime;
-        if (prevTime == 0)
-            deltaTime = Time.deltaTime;
-        else
-            deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
+
+        deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
         prevTime = Time.realtimeSinceStartupAsDouble;
         return deltaTime;
     }
@@ -110,11 +110,12 @@ public  class PhysicsEngine : MonoBehaviour
     {
         double prevDeltaTime = deltaTime;
         deltaTime = CalcDeltaTime();
-        if (prevDeltaTime / deltaTime < 0.5f)
-            return;
+        if (skipFPSspikes)
+            if (prevDeltaTime / deltaTime < 0.5f)
+                return;
         //deltaTime = Time.deltaTime;
-
-
+        //deltaTime = 1.0 / 60.0;
+        //TripplePendulomAnalytical.Simulate(deltaTime);
         double h = deltaTime / substeps;
 
         if (optimizeCollisionDetection && performBroadPhaseOncePerSimStep && selfCollisions)

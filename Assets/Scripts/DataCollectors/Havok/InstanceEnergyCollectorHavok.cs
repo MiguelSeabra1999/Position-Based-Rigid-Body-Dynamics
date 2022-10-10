@@ -27,8 +27,6 @@ public partial class EnergyCollectorHavokSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        var deltaTime = Time.DeltaTime;
-
         Entities
             .WithName("CollectEnergy")
             .WithBurst()

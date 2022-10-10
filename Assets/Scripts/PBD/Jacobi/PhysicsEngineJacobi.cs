@@ -67,7 +67,7 @@ public class PhysicsEngineJacobi : PhysicsEngine
             collisionEngine.count = 0;
             collisionEngine.FullCollisionDetection(collisionEngine.allColliders , h, corrections);
         }
-        ApplyCorrections();
+        ApplyCorrectionsCollisions();
         ClearCorrections();
     }
 
@@ -97,20 +97,32 @@ public class PhysicsEngineJacobi : PhysicsEngine
         }
     }
 
+    private void ApplyCorrectionsCollisions()
+    {
+        for (int i = 0; i < corrections.Count; i++)
+        {
+            Correction correction = GetAverageCorrection(corrections[i]);
+            allBodies[i].position += correction.positional;
+            //    Debug.Log("Adding " + correction.positional + " to body " + allBodies[i].indexID);
+            allBodies[i].SetRotation(DoubleQuaternion.Normal(allBodies[i].GetOrientation() + correction.rotational));
+        }
+    }
+
     private Correction GetAverageCorrection(List<Correction> corrections)
     {
-        Correction sum = new Correction(new DoubleVector3(0), new DoubleQuaternion(0, 0, 0, 0));
+        Correction sum = new Correction(new DoubleVector3(0), new DoubleQuaternion(0, 0, 0, 0), 0);
         int count = 0;
         if (corrections.Count == 0)
             return sum;
         for (int i = 0; i < corrections.Count; i++)
         {
             sum += corrections[i];
-            if (corrections[i].positional != new DoubleVector3(0))
+            if (corrections[i].positional != new DoubleVector3(0) || corrections[i].rotational != new DoubleQuaternion(0, 0, 0, 0))
                 count++;
         }
         if (count == 0)
             return sum;
+
         return sum / count;
     }
 }

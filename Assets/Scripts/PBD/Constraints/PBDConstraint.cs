@@ -100,7 +100,7 @@ public abstract class PBDConstraint
 
                 DoubleVector3 positional = GetSign(i) * correction;
                 DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
-                corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+                corrections[bodies[i].indexID].Add(new Correction(positional, rotational, lagrangeMult));
 
                 //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);
             }
@@ -155,7 +155,7 @@ public abstract class PBDConstraint
                 DoubleQuaternion rotational = GetOrientationCorrection(GetGradient(i) * lagrangeMult , GetSign(i), i);
                 lock (corrections)
                 {
-                    corrections[bodies[i].indexID].Add(new Correction(positional, rotational));
+                    corrections[bodies[i].indexID].Add(new Correction(positional, rotational, lagrangeMult));
                 }
 
                 //   Debug.DrawRay(bodies[i].position.ToVector3(), GetGradient(i).ToVector3(), Color.white, 0.01f);

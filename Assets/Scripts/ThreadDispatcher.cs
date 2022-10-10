@@ -62,6 +62,33 @@ public class ThreadDispatcher
         }
     }
 
+    public void DistributeLoad(int loadSize, double h, List<List<Correction>> corrections)
+    {
+        countdownEvent.Reset();
+        int increment =  loadSize / NTHREADS;
+        if (increment == 0 || loadSize < NTHREADS)
+        {
+            for (int i = 0; i < NTHREADS; i++)
+            {
+                if (i + 1 > loadSize)
+                    countdownEvent.Signal();
+                else
+                    InitThread(i , (i + 1), h, i, corrections);
+            }
+
+            countdownEvent.Wait();
+        }
+        else
+        {
+            for (int i = 0; i < NTHREADS - 1; i++)
+            {
+                InitThread(i * increment, (i + 1) * increment, h, i, corrections);
+            }
+            InitThread((NTHREADS - 1) * increment, loadSize, h, NTHREADS - 1, corrections);
+            countdownEvent.Wait();
+        }
+    }
+
     public void InitThread(int from, int to, double h, int i)
     {
         ThreadPool.QueueUserWorkItem(new WaitCallback(
@@ -73,7 +100,22 @@ public class ThreadDispatcher
         ));
     }
 
+    public void InitThread(int from, int to, double h, int i, List<List<Correction>> corrections)
+    {
+        ThreadPool.QueueUserWorkItem(new WaitCallback(
+            (object callback) =>
+            {
+                DoWork(from, to, h, i, corrections);
+                countdownEvent.Signal();
+            }
+        ));
+    }
+
     protected virtual void DoWork(int from, int to, double h, int i)
+    {
+    }
+
+    protected virtual void DoWork(int from, int to, double h, int i, List<List<Correction>> corrections)
     {
     }
 

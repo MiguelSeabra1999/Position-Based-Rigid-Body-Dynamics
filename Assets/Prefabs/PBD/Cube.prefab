@@ -80,7 +80,7 @@ PrefabInstance:
     - target: {fileID: 3487053806852750060, guid: fc2cf783b42ea6f4f9ce9f5062293d5d,
         type: 3}
       propertyPath: restitution
-      value: 0.3
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 3487053806852750060, guid: fc2cf783b42ea6f4f9ce9f5062293d5d,
         type: 3}
@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particle: {fileID: 0}
+  exclude: 0
   pos: {x: 0, y: 0, z: 0}
   isTrigger: 0
   dims: {x: 1, y: 1, z: 1}

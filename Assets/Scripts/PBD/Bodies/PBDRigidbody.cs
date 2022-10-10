@@ -238,7 +238,7 @@ public class PBDRigidbody : Particle
         return CalcLinearKineticEnergy() + CalcRotationalKineticEnergy();
     }
 
-    private double CalcRotationalKineticEnergy()
+    public override double CalcRotationalKineticEnergy()
     {
         DoubleVector3 wSelf = orientation.Inverse() * angularVelocity;
         DoubleVector3 aux = inertiaTensor * DoubleVector3.Normal(wSelf);

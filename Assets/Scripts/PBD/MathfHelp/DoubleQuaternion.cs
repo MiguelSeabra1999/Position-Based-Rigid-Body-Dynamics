@@ -177,6 +177,28 @@ public readonly struct DoubleQuaternion
         );
     }
 
+    public static bool operator==(DoubleQuaternion a, DoubleQuaternion b)
+    {
+        return (a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w);
+    }
+
+    public static bool operator!=(DoubleQuaternion a, DoubleQuaternion b)
+    {
+        return !(a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w);
+    }
+
+    public override bool Equals(object o)
+    {
+        if (o == null)
+            return false;
+        return (DoubleQuaternion)o == this;
+    }
+
+    public override int GetHashCode()
+    {
+        return (this.ToString()).GetHashCode();
+    }
+
     public override string ToString()
     {
         return "(" + this.w + ", " + this.x + ", " + this.y + ", " + this.z + ")";
@@ -287,6 +309,8 @@ public readonly struct DoubleQuaternion
 
     public static DoubleQuaternion Power(DoubleQuaternion q, double exp)
     {
+        if (q == new DoubleQuaternion(0, 0, 0, 0))
+            return q;
         q = DoubleQuaternion.Normal(q);
 
         if (exp == 1)
@@ -297,6 +321,7 @@ public readonly struct DoubleQuaternion
         double angle = Math.Asin(DoubleVector3.Magnitude(v) / DoubleQuaternion.Magnitude(q));
         DoubleVector3 aux = n * Math.Sin(exp * angle);
         DoubleQuaternion result = Math.Pow(DoubleQuaternion.Magnitude(q), exp) * new DoubleQuaternion(Math.Cos(exp * angle) , aux.x, aux.y, aux.z);
+
 
         return DoubleQuaternion.Normal(result);
     }

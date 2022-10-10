@@ -1,0 +1,11 @@
+[0] NaN
+[10] NaN
+[20] NaN
+[30] NaN
+[40] NaN
+[50] NaN
+[60] NaN
+[70] NaN
+[80] NaN
+[90] NaN
+[100] NaN

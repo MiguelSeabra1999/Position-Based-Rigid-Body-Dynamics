@@ -51,12 +51,12 @@ public class SpawnerCloth : MonoBehaviour
 
         CreateCloth();
         CreateMesh();
-        particles[0, 0].inverseMass = 0;
-        particles[0, 0].gravityScale = 0;
+        //particles[0, 0].inverseMass = 0;
+        //particles[0, 0].gravityScale = 0;
         particles[0, dims.y - 1].inverseMass = 0;
         particles[0, dims.y - 1].gravityScale = 0;
-        particles[dims.x - 1, 0].inverseMass = 0;
-        particles[dims.x - 1, 0].gravityScale = 0;
+        //particles[dims.x - 1, 0].inverseMass = 0;
+        //particles[dims.x - 1, 0].gravityScale = 0;
         particles[dims.x - 1, dims.y - 1].inverseMass = 0;
         particles[dims.x - 1, dims.y - 1].gravityScale = 0;
 /** /

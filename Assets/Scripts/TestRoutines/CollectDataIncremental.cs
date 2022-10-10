@@ -9,6 +9,7 @@ public  class CollectDataIncremental : MonoBehaviour
     public int maxSubsteps = 100;
     public float simulationTime = 10;
     protected int currentSteps;
+    private AudioSource completeSound;
 
     protected GameObject currentScenario;
     private CollectionRoutine[] collectionRoutines;
@@ -16,6 +17,7 @@ public  class CollectDataIncremental : MonoBehaviour
     void Awake()
     {
         collectionRoutines = GetComponents<CollectionRoutine>();
+        completeSound = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -36,13 +38,21 @@ public  class CollectDataIncremental : MonoBehaviour
         CollectAllData(currentScenario, currentSteps);
 
         Destroy(currentScenario);
+        yield return new WaitForSeconds(1);
         GC.Collect();
-
+        yield return new WaitForSeconds(1);
         currentSteps += step;
         if (currentSteps <= maxSubsteps)
             StartCoroutine(TestScenario(currentSteps));
         else
+        {
             WriteAllData();
+            if (completeSound)
+            {
+                completeSound.Play();
+                yield return new WaitForSeconds(5);
+            }
+        }
     }
 
     protected  void CollectAllData(GameObject scenario, int step)
