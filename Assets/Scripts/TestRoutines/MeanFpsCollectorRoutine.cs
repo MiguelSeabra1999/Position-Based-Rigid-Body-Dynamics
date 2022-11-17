@@ -7,6 +7,7 @@ public class MeanFpsCollectorRoutine : CollectionRoutine
     double prevTime = 0;
     private List<double> fps = new List<double>();
 
+
     void Update()
     {
         fps.Add(CalcFps());
@@ -15,12 +16,16 @@ public class MeanFpsCollectorRoutine : CollectionRoutine
     private double CalcFps()
     {
         double deltaTime;
-        if (prevTime == 0)
-            deltaTime = Time.deltaTime;
-        else
-            deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
+
+        deltaTime = (Time.realtimeSinceStartupAsDouble - prevTime) * Time.timeScale;
         prevTime = Time.realtimeSinceStartupAsDouble;
         return 1 / deltaTime;
+    }
+
+    public override void InitScenario(GameObject scenario)
+    {
+        fps.Clear();
+        prevTime = Time.realtimeSinceStartupAsDouble;
     }
 
     public override void CollectData(GameObject scenario, int step)

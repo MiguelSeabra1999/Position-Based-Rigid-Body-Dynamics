@@ -108,34 +108,8 @@ public class EnergyCollectorHavok : MonoBehaviour
             instance.potentialEnergyBuffer.Add(potential);
         lock (instance.totalEnergyBuffer)
             instance.totalEnergyBuffer.Add(linearEnergy + rotationalEnergy + potential);
-
-
-        /*   DateTimeOffset now = (DateTimeOffset)DateTime.UtcNow;  // using System;
-           long nowInMilliseconds = now.ToUnixTimeMilliseconds();
-
-           double realDeltaTime = 0.001 * (nowInMilliseconds - instance.prevTime);
-           instance.prevTime = nowInMilliseconds;
-
-           Debug.Log("real fps" + 1.0 / realDeltaTime);*/
     }
 
-    /*  private static double CalcKineticEnergy(float3 linear, float3 angular, float mass, float3 inverseInertiaTensor, Rotation rotation)
-      {
-          Vector3 linearVelocity = new Vector3(linear.x, linear.y, linear.z);
-          Vector3 angularVelocity = new Vector3(angular.x, angular.y, angular.z);
-          Vector3 inertiaTensor = new Vector3(1 / inverseInertiaTensor.x, 1 / inverseInertiaTensor.y, 1 / inverseInertiaTensor.z);
-          Quaternion q = rotation.Value;
-          float linearEnergy = linearVelocity.magnitude * linearVelocity.magnitude * mass * .5f;
-
-          Vector3 wSelf = Quaternion.Inverse(q) * angularVelocity;
-          wSelf.Normalize();
-          Vector3 aux = new Vector3(inertiaTensor.x * wSelf.x, inertiaTensor.y * wSelf.y, inertiaTensor.z * wSelf.z);
-          float moment = aux.magnitude;
-          float w = angularVelocity.magnitude;
-          double angularEnergy = 0.5 * moment * w * w;
-
-          return linearEnergy + angularEnergy;
-      }*/
     private static double CalcRotationalEnergy(float3 linear, float3 angular, float mass, float3 inverseInertiaTensor, Rotation rotation)
     {
         Vector3 angularVelocity = new Vector3(angular.x, angular.y, angular.z);
@@ -158,6 +132,6 @@ public class EnergyCollectorHavok : MonoBehaviour
 
     public static double CalcPotentialEnergy(float3 pos, float mass)
     {
-        return mass * 9.8f *  pos.y;
+        return mass * 9.81f *  pos.y;
     }
 }

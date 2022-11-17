@@ -30,4 +30,9 @@ public struct Correction
     {
         return new Correction(a.positional * b , a.rotational * b, 0);
     }
+
+    public static Correction operator*(double b, Correction a)
+    {
+        return new Correction(a.positional * b , a.rotational * b, 0);
+    }
 }

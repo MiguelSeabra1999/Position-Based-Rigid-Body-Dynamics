@@ -7,6 +7,7 @@ public abstract class PBDAngularConstraint : PBDConstraint
 {
     public override void Init(Particle[] allParticles)
     {
+        base.Init(allParticles);
     }
 
     protected override double GetLagrangeMultiplier(double error, double deltaTime)

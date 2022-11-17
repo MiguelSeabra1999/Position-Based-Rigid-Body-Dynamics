@@ -49,6 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7f7b477acfce74790f94fef77f0e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skipFPSspikes: 0
   parallelConstraintSolve: 1
   parallelCollisionSolve: 1
   parallelBroadCollisionSolve: 1
@@ -66,7 +67,7 @@ MonoBehaviour:
   allBodies: []
   allParticles: []
   allRigidbodies: []
-  substeps: 20
+  substeps: 1
   distanceConstraints: []
   ballJointConstraint: []
   twistConstraint: []
@@ -128,6 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d0e628aaff374d42ad3a7cd77834f33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  subFolder: 
 --- !u!1001 &3971845552606476375
 PrefabInstance:
   m_ObjectHideFlags: 0

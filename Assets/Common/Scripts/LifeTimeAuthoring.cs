@@ -26,7 +26,7 @@ public partial class LifeTimeSystem : SystemBase
         using (var commandBuffer = new EntityCommandBuffer(Allocator.TempJob))
         {
             Entities
-                .WithName("DestroyExpiredLifeTime")
+                .WithName("LifeTime")
                 .ForEach((Entity entity, ref LifeTime timer) =>
                 {
                     timer.Value -= 1;

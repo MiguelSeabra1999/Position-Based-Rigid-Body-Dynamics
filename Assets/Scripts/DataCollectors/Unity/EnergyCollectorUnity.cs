@@ -139,7 +139,7 @@ public class EnergyCollectorUnity : MonoBehaviour
             return 0;
         if (!rb.gameObject.activeInHierarchy)
             return 0;
-        return rb.mass * 9.8f *  rb.transform.position.y;
+        return rb.mass * 9.81f *  rb.transform.position.y;
     }
 
     public double CalcTotalEnergy(Rigidbody rb)

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,8 @@ public class FPScontrollerPBD : PBDMonoBehaviour
     private void Awake()
     {
         rb = GetComponent<PBDRigidbody>();
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public override void PBDUpdate(double deltaTime)

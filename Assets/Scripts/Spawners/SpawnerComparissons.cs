@@ -30,7 +30,7 @@ public class SpawnerComparissons : MonoBehaviour
 
     private int count = 0;
     public PrefabSO prefabSO;
-    private GameObject pbd, havok, unity, jacobi;
+    [HideInInspector] public GameObject pbd, havok, unity, jacobi;
     private PhysicsEngine pbdEngine;
     private PhysicsEngineJacobi jacobiEngine;
 
@@ -113,6 +113,7 @@ public class SpawnerComparissons : MonoBehaviour
             if (randRotation)
                 rotation = Random.rotation;
             SpawnAllVersionsCube(point + noise, rotation);
+            //SpawnAllVersionsRandom(point + noise,  Random.rotation);
         }
     }
 
@@ -134,6 +135,35 @@ public class SpawnerComparissons : MonoBehaviour
         GameObject objHavok = SpawnInstance(prefabSO.havokCube, pos, rot, havok.transform);
         GameObject objUnity = SpawnInstance(prefabSO.unityCube, pos, rot, unity.transform);
         return new Objects(obj, objJacobi, objHavok, objUnity);
+    }
+
+    private Objects SpawnAllVersionsRandom(Vector3 pos, Quaternion rot)
+    {
+        if (pbd == null)
+            CreateScenes();
+        Objects objs = GetRandom();
+        GameObject obj = SpawnInstance(objs.pbd, pos, rot, pbd.transform);
+        GameObject objJacobi = SpawnInstance(objs.jacobi, pos, rot, jacobi.transform);
+        GameObject objHavok = SpawnInstance(objs.havok, pos, rot, havok.transform);
+        GameObject objUnity = SpawnInstance(objs.unity, pos, rot, unity.transform);
+        return new Objects(obj, objJacobi, objHavok, objUnity);
+    }
+
+    private Objects GetRandom()
+    {
+        return new Objects(prefabSO.pbdCapsule, prefabSO.pbdCapsule, prefabSO.havokCapsule, prefabSO.unityCapsule);
+        /*int r = Random.Range(0, 3);
+        switch (r)
+        {
+            case 0:
+                return new Objects(prefabSO.pbdSphere, prefabSO.pbdSphere, prefabSO.havokSphere, prefabSO.unitySphere);
+            case 1:
+                return new Objects(prefabSO.pbdCube, prefabSO.pbdCube, prefabSO.havokCube, prefabSO.unityCube);
+            case 2:
+                return new Objects(prefabSO.pbdCapsule, prefabSO.pbdCapsule, prefabSO.havokCapsule, prefabSO.unityCapsule);
+            default:
+                return new Objects(null, null, null, null);
+        }*/
     }
 
     private Objects SpawnAllVersionsCube(Vector3 pos, Quaternion rot, Vector3 scale)
@@ -213,6 +243,28 @@ public class SpawnerComparissons : MonoBehaviour
 
         GameObject objUnity = SpawnInstance(prefabSO.unitySphere, pos, rot, unity.transform);
         MakeStaticUnity(objUnity);
+
+        return new Objects(obj, jacobiObj, objHavok, objUnity);
+    }
+
+    private Objects SpawnAllVersionsStaticCube(Vector3 pos, Quaternion rot, Vector3 scale)
+    {
+        if (pbd == null)
+            CreateScenes();
+        GameObject obj = SpawnInstance(prefabSO.pbdCube, pos, rot, pbd.transform);
+        MakeStaticPBD(obj);
+        obj.transform.localScale = scale;
+
+        GameObject jacobiObj = SpawnInstance(prefabSO.pbdCube, pos, rot, jacobi.transform);
+        MakeStaticPBD(jacobiObj);
+        jacobiObj.transform.localScale = scale;
+
+        GameObject objHavok = SpawnInstance(prefabSO.havokCubeStatic, pos, rot, havok.transform);
+        objHavok.transform.localScale = scale;
+
+        GameObject objUnity = SpawnInstance(prefabSO.unityCube, pos, rot, unity.transform);
+        MakeStaticUnity(objUnity);
+        objUnity.transform.localScale = scale;
 
         return new Objects(obj, jacobiObj, objHavok, objUnity);
     }
@@ -319,6 +371,7 @@ public class SpawnerComparissons : MonoBehaviour
     private void SpawnRope()
     {
         SpawnRopeHorizontal(startPos, dims.x);
+        RemovePlanes();
     }
 
     private void SpawnRopeHorizontal(Vector3 pos, int len)
@@ -465,7 +518,7 @@ public class SpawnerComparissons : MonoBehaviour
 
         currentObject.pbd.AddComponent<DeviationCollector>().subFolder = "PBD";
         currentObject.jacobi.AddComponent<DeviationCollector>().subFolder = "Jacobi";
-        currentObject.havok.AddComponent<InstanceDeviationCollectorHavok>();
+        // currentObject.havok.AddComponent<InstanceDeviationCollectorHavok>();
         currentObject.unity.AddComponent<DeviationCollectorUnity>();
     }
 
@@ -476,5 +529,22 @@ public class SpawnerComparissons : MonoBehaviour
         SpawnAllVersionsCube(Vector3.up * 1.15f, Quaternion.identity, new Vector3(8, 0.2f, 1));
         SpawnSingleStack(new Vector3(-3.5f, 1.8f, 0), dims.x);
         SpawnSingleStack(new Vector3(3.5f, 1.8f, 0), dims.y);
+    }
+
+    private void RemovePlanes()
+    {
+        DestroyImmediate(transform.GetChild(0).Find("Plane").gameObject);
+        DestroyImmediate(transform.GetChild(1).Find("Plane").gameObject);
+        DestroyImmediate(transform.GetChild(2).Find("Plane").gameObject);
+        DestroyImmediate(transform.GetChild(3).Find("Plane").gameObject);
+    }
+
+    [ContextMenu("SpawnFriction")]
+    private void Friction()
+    {
+        Objects floor = SpawnAllVersionsStaticCube(startPos, transform.rotation, new Vector3(10, 10, 10));
+        RemovePlanes();
+        Objects cube = SpawnAllVersionsCube(startPos + Vector3.up * 6, transform.rotation, new Vector3(1, 1, 1));
+        Objects sphere = SpawnAllVersionsSphere(startPos + Vector3.up * 6 + Vector3.forward * 2, Quaternion.identity);
     }
 }

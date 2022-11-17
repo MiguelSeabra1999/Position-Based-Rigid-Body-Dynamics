@@ -46,7 +46,7 @@ public  class PhysicsEngine : MonoBehaviour
 
     protected ThreadDispatcher threadDispatcher = new ThreadDispatcher();
     public double deltaTime;
-
+    private double startSimulationTime;
 
     protected virtual void Start()
     {
@@ -95,6 +95,7 @@ public  class PhysicsEngine : MonoBehaviour
             c.Init(allBodies);
         //threads = new Thread[constraints.Length];
         prevTime = Time.realtimeSinceStartupAsDouble;
+        startSimulationTime = Time.realtimeSinceStartupAsDouble;
     }
 
     private double CalcDeltaTime()
@@ -111,7 +112,7 @@ public  class PhysicsEngine : MonoBehaviour
         double prevDeltaTime = deltaTime;
         deltaTime = CalcDeltaTime();
         if (skipFPSspikes)
-            if (prevDeltaTime / deltaTime < 0.5f)
+            if (prevDeltaTime / deltaTime < 0.5f && Time.realtimeSinceStartupAsDouble - startSimulationTime > 2)
                 return;
         //deltaTime = Time.deltaTime;
         //deltaTime = 1.0 / 60.0;

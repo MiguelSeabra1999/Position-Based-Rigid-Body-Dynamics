@@ -27,6 +27,8 @@ MonoBehaviour:
     type: 3}
   havokCube: {fileID: 1877213096559564713, guid: 03f99ac74d7e5f14a93952ffe722cfcb,
     type: 3}
+  havokCubeStatic: {fileID: 1877213096559564713, guid: 7717ab13db6fad2448370f3405c44a7b,
+    type: 3}
   havokCapsule: {fileID: 1877213096559564713, guid: 098d82e5392e6d146baf2d02bbd438d9,
     type: 3}
   havokCapsuleTrigger: {fileID: 1877213096559564713, guid: 667012bd04d74c94394fe2933208df2c,
@@ -34,6 +36,8 @@ MonoBehaviour:
   havokSphere: {fileID: 1877213096559564713, guid: 5c049498112f82b4fa1e51d2b2c220a3,
     type: 3}
   havokSphereStatic: {fileID: 1877213096559564713, guid: b1d66fa7a29a9f2499f0728dbf3c0d6c,
+    type: 3}
+  havokParticle: {fileID: 1877213096559564713, guid: e13051480dd5edd4b85d04a8cc4cc847,
     type: 3}
   havokScene: {fileID: 2955907569638550515, guid: ea4e548251b026a4e8e8eca6c0b54364,
     type: 3}

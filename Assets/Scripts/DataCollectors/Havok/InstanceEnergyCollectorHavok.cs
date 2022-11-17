@@ -17,7 +17,8 @@ public class InstanceEnergyCollectorHavok : MonoBehaviour, IConvertGameObjectToE
         {
             id = idCount
         });
-        //  Debug.Log("havok object " + gameObject.name + " is id " + idCount);
+
+        DestroyEntitiesOnDestroy.entities.Add(entity);
         idCount++;
     }
 }

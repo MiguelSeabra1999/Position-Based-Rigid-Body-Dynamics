@@ -101,7 +101,7 @@ public class PhysicsEngineJacobi : PhysicsEngine
     {
         for (int i = 0; i < corrections.Count; i++)
         {
-            Correction correction = GetAverageCorrection(corrections[i]);
+            Correction correction = GetSum(corrections[i]);
             allBodies[i].position += correction.positional;
             //    Debug.Log("Adding " + correction.positional + " to body " + allBodies[i].indexID);
             allBodies[i].SetRotation(DoubleQuaternion.Normal(allBodies[i].GetOrientation() + correction.rotational));
@@ -111,18 +111,45 @@ public class PhysicsEngineJacobi : PhysicsEngine
     private Correction GetAverageCorrection(List<Correction> corrections)
     {
         Correction sum = new Correction(new DoubleVector3(0), new DoubleQuaternion(0, 0, 0, 0), 0);
-        int count = 0;
+        int pCount = 0;
+        int rCount = 0;
         if (corrections.Count == 0)
             return sum;
         for (int i = 0; i < corrections.Count; i++)
         {
             sum += corrections[i];
-            if (corrections[i].positional != new DoubleVector3(0) || corrections[i].rotational != new DoubleQuaternion(0, 0, 0, 0))
-                count++;
+            if (corrections[i].positional != new DoubleVector3(0))
+                pCount++;
+            if (corrections[i].rotational != new DoubleQuaternion(0, 0, 0, 0))
+                rCount++;
         }
-        if (count == 0)
+        if (rCount == 0 && pCount == 0)
             return sum;
 
-        return sum / count;
+        DoubleVector3 p;
+        DoubleQuaternion r;
+        if (pCount == 0)
+            p = new DoubleVector3(0);
+        else
+            p = sum.positional / pCount;
+
+        if (rCount == 0)
+            r = new DoubleQuaternion(0, 0, 0, 0);
+        else
+            r = sum.rotational * (1.0 / rCount);
+
+        return new Correction(p, r, sum.lagrangian);
+    }
+
+    private Correction GetSum(List<Correction> corrections)
+    {
+        Correction sum = new Correction(new DoubleVector3(0), new DoubleQuaternion(0, 0, 0, 0), 0);
+        if (corrections.Count == 0)
+            return sum;
+        for (int i = 0; i < corrections.Count; i++)
+        {
+            sum += corrections[i];
+        }
+        return sum;
     }
 }

@@ -5,14 +5,16 @@ using UnityEngine;
 public class SetRBvelocityAtStart : MonoBehaviour
 {
     public Vector3 initialVelocity = Vector3.zero;
+    public Vector3 initialAngularVelocity = Vector3.zero;
+    private Rigidbody rb;
     // Start is called before the first frame update
     void Start()
     {
-        GetComponent<Rigidbody>().velocity = initialVelocity;
+        rb = GetComponent<Rigidbody>();
+        rb.maxAngularVelocity = 1000;
+        rb.velocity = initialVelocity;
+        rb.angularVelocity = initialAngularVelocity;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-    }
 }
